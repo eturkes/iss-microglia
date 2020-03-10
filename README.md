@@ -21,4 +21,5 @@
 # ISS Scripts
 #### *These files are maintained to varying degrees*
 
-Repo for in-situ sequencing (ISS) scripts
+Repo for in-situ sequencing (ISS) scripts.  
+See here for source code of the primary software ([https://github.com/jduffield65/iss](https://github.com/jduffield65/iss)).
