@@ -63,7 +63,7 @@ o.MaxWaitTime = 21600;
 
 %run code
 try
-    o = o.extract_and_filter;
+    o = o.extract_and_filter_NoGPU;
 catch
     o = o.extract_and_filter_NoGPU;
 end
