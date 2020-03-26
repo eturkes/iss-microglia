@@ -42,7 +42,7 @@ o.RawFileExtension = '.nd2';
 o.TileDirectory = fullfile(pwd, SliceNb, 'tiles');
 mkdir(o.TileDirectory);
 o.DapiChannel = 1;
-o.AnchorChannel =  ;    %Channel that has most spots in anchor round
+o.AnchorChannel =  4;    %Channel that has most spots in anchor round
 o.ReferenceRound = 8;
 o.FirstBaseChannel = 1;
 o.OutputDirectory = fullfile(pwd, SliceNb, 'output');
