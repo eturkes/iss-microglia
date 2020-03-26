@@ -28,7 +28,7 @@ SliceNb = 'Round0-6_SplitAnchor00';
 mkdir(fullfile(pwd, SliceNb));
 
 %FileBase{r} is the file name of the raw data of round r in o.InputDirectory
-o.FileBase = cell(o.nRounds + o.nExtraRounds, 1);
+o.FileBase = cell(o.nRounds+o.nExtraRounds,1);
 o.FileBase{1} = strcat(SliceNb, '1');
 o.FileBase{2} = strcat(SliceNb, '2');
 o.FileBase{3} = strcat(SliceNb, '3');
@@ -42,7 +42,7 @@ o.RawFileExtension = '.nd2';
 o.TileDirectory = fullfile(pwd, SliceNb, 'tiles');
 mkdir(o.TileDirectory);
 o.DapiChannel = 1;
-o.AnchorChannel = 4;
+o.AnchorChannel =  ;    %Channel that has most spots in anchor round
 o.ReferenceRound = 8;
 o.FirstBaseChannel = 1;
 o.OutputDirectory = fullfile(pwd, SliceNb, 'output');
@@ -51,14 +51,22 @@ o.bpLabels = {'0', '1', '2', '3','4','5','6'}; %order of bases
 
 %These specify the dimensions of the filter. R1 should be approximately the
 %radius of the spot and R2 should be double this.
-o.ExtractR1 = 3;
-o.ExtractR2 = 6;
+o.ExtractR1 = 'auto';
+o.ExtractR2 = 'auto';
 
-o.ExtractScale = 2;
+o.ExtractScale = 'auto';
 o.TilePixelValueShift = 15000;
 
+%Max time (seconds) to wait for raw .nd2 files to be obtained
+o.MaxWaitTime1 = 60;      %Less time for round 1 incase name is wrong
+o.MaxWaitTime = 21600;  
+
 %run code
-o = o.extract_and_filter;
+try
+    o = o.extract_and_filter;
+catch
+    o = o.extract_and_filter_NoGPU;
+end
 save(fullfile(o.OutputDirectory, 'oExtract'), 'o', '-v7.3');
 
 %% register
