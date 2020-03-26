@@ -110,7 +110,7 @@ o.UseChannels = 1:o.nBP;
 o.UseRounds = 1:o.nRounds;
 
 %Search paramaters
-o.InitialShiftChannel = 4;      %Channel to use to find initial shifts between rounds
+o.InitialShiftChannel = 7;      %Channel to use to find initial shifts between rounds
 o.FindSpotsMinScore = 'auto';
 o.FindSpotsStep = [5,5];
 %FindSpotsSearch can either be a 1x1 struct or a o.nRounds x 1 cell of
