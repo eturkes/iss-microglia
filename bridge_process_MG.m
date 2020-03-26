@@ -146,11 +146,13 @@ save(fullfile(o.OutputDirectory, 'oCall_spots'), 'o', '-v7.3');
 o.CombiQualThresh = 0.7;
 BigDapiImage = imread(o.BigDapiFile);
 o.plot(BigDapiImage);
+set(gca, 'YDir', 'reverse')
+set(gca, 'XDir', 'reverse')
 
 %iss_view_codes(o,234321,1);
-%o.pIntensityThresh = 100;
-%o.pScoreThresh = 10;
-%iss_change_plot(o,'Prob');
+o.pIntensityThresh = 100;
+o.pScoreThresh = 10;
+iss_change_plot(o,'Prob');
 %iss_view_prob(o,234321,1);
 %iss_change_plot(o,'DotProduct');
 
