@@ -156,3 +156,13 @@ iss_change_plot(o,'Prob');
 %iss_view_prob(o,234321,1);
 %iss_change_plot(o,'DotProduct');
 
+%% individual genes
+fp = fopen(o.CodeFile, 'r');
+tmp = textscan(fp, '%s %s', inf);
+GeneName=tmp{1};
+fclose(fp);
+
+for i = 1:length(GeneName)
+    iss_change_plot(o,'Prob',[{'Nrn1'},GeneName{i}])
+    saveas(gcf, fullfile(pwd, 'individual-genes', strcat(GeneName{i}, '.png')))
+end
