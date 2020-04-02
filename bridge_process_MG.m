@@ -1,15 +1,19 @@
-%% extract and filter
+%% Parameters that should be checked before each run
+%CHECK BEFORE EACH RUN
 
-%parameters
 o = iss;
-o.nRounds = 7;
-o.nExtraRounds = 1;         %Treat Anchor channel as extra round
+o.AnchorChannel =  7;            %Channel that has most spots in anchor round (o.ReferenceRound)
+o.DapiChannel = 1;              %Channel in anchor round that contains Dapi images
+o.InitialShiftChannel = 7;      %Channel to use to find initial shifts between rounds
+o.ReferenceRound = 8;           %Index of anchor round
+o.RawFileExtension = '.nd2';    %Format of raw data
+
+%% File Names
+%CHECK BEFORE EACH RUN
 o.InputDirectory = pwd;     %Folder path of raw data
 
-SliceNb = 'Round0-6_SplitAnchor00';
-mkdir(fullfile(pwd, SliceNb));
-
 %FileBase{r} is the file name of the raw data of round r in o.InputDirectory
+SliceNb = 'Round0-6_SplitAnchor00';
 o.FileBase = cell(o.nRounds+o.nExtraRounds,1);
 o.FileBase{1} = strcat(SliceNb, '1');
 o.FileBase{2} = strcat(SliceNb, '2');
@@ -20,15 +24,18 @@ o.FileBase{6} = strcat(SliceNb, '6');
 o.FileBase{7} = strcat(SliceNb, '7');
 o.FileBase{8} = strcat(SliceNb, '8');    %Make sure the last round is the anchor
 
-o.RawFileExtension = '.nd2';
 o.TileDirectory = fullfile(pwd, SliceNb, 'tiles');
-mkdir(o.TileDirectory);
-o.DapiChannel = 1;
-o.AnchorChannel =  7;    %Channel that has most spots in anchor round
-o.ReferenceRound = 8;
-o.FirstBaseChannel = 1;
 o.OutputDirectory = fullfile(pwd, SliceNb, 'output');
-mkdir(o.OutputDirectory);
+%Codebook is a text file containing 2 columns - 1st is the gene name. 2nd is
+%the code, length o.nRounds and containing numbers in the range from 0 to o.nBP-1.
+o.CodeFile = fullfile('codebook_comb.txt');
+
+%% extract and filter
+
+%parameters
+o.nRounds = 7;
+o.nExtraRounds = 1;         %Treat Anchor channel as extra round
+o.FirstBaseChannel = 1;
 o.bpLabels = {'0', '1', '2', '3','4','5','6'}; %order of bases
 
 %These specify the dimensions of the filter. R1 should be approximately the
@@ -92,7 +99,6 @@ o.UseChannels = 1:o.nBP;
 o.UseRounds = 1:o.nRounds;
 
 %Search paramaters
-o.InitialShiftChannel = 7;      %Channel to use to find initial shifts between rounds
 o.FindSpotsMinScore = 'auto';
 o.FindSpotsStep = [5,5];
 %FindSpotsSearch can either be a 1x1 struct or a o.nRounds x 1 cell of
@@ -111,12 +117,6 @@ o = o.find_spots2;
 save(fullfile(o.OutputDirectory, 'oFind_spots'), 'o', '-v7.3');
 
 %% call spots
-
-%parameters
-%Codebook is a text file containing 2 columns - 1st is the gene name. 2nd is
-%the code, length o.nRounds and containing numbers in the range from 0 to o.nBP-1.
-o.CodeFile = fullfile('codebook_comb.txt');
-
 %run code
 o.CallSpotsCodeNorm = 'WholeCode';      %Other alternative is 'Round'
 o = o.call_spots;
@@ -138,13 +138,3 @@ iss_change_plot(o,'Prob');
 %iss_view_prob(o,234321,1);
 %iss_change_plot(o,'DotProduct');
 
-%% individual genes
-fp = fopen(o.CodeFile, 'r');
-tmp = textscan(fp, '%s %s', inf);
-GeneName=tmp{1};
-fclose(fp);
-
-for i = 1:length(GeneName)
-    iss_change_plot(o,'Prob',[{'Nrn1'},GeneName{i}])
-    saveas(gcf, fullfile(pwd, 'individual-genes', strcat(GeneName{i}, '.png')))
-end
