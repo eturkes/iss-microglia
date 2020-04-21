@@ -1,10 +1,9 @@
 %% Load Data
-load(fullfile(pwd, 'o.mat'));
-BigDapiImage = imread(o.BigDapiFile);
+load(fullfile(pwd, 'latest-software-pixelbased.mat'));
+Roi = round([1, max(o.SpotGlobalYX(:,2)), 1, max(o.SpotGlobalYX(:,1))]);
 
 %% Plot All Spots
-o.plot(BigDapiImage);
-iss_change_plot(o, 'Prob');
+o.plot(o.BigDapiFile, Roi, 'Prob');
 set(gca, 'YDir', 'reverse')
 set(gca, 'XDir', 'reverse')
 

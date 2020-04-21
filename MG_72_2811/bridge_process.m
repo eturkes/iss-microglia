@@ -2,10 +2,12 @@
 %CHECK BEFORE EACH RUN
 
 o = iss;
+o.AnchorRound = 8;              %Round that contains Dapi image
 o.AnchorChannel =  7;            %Channel that has most spots in anchor round (o.ReferenceRound)
 o.DapiChannel = 1;              %Channel in anchor round that contains Dapi images
 o.InitialShiftChannel = 7;      %Channel to use to find initial shifts between rounds
 o.ReferenceRound = 8;           %Index of anchor round
+o.ReferenceChannel = 7;         %o.ReferenceChannel. If RefRound = AnchorRound, this has to be AnchorChannel.
 o.RawFileExtension = '.nd2';    %Format of raw data
 
 %% File Names
@@ -51,15 +53,11 @@ o.MaxWaitTime1 = 60;      %Less time for round 1 incase name is wrong
 o.MaxWaitTime = 21600;  
 
 %run code
-try
-    o = o.extract_and_filter_NoGPU;
-catch
-    o = o.extract_and_filter_NoGPU;
-end
+o = o.extract_and_filter_NoGPU;
 save(fullfile(o.OutputDirectory, 'oExtract'), 'o', '-v7.3');
 
 %% register
-o.AutoThresh(:,o.AnchorChannel,o.ReferenceRound) = o.AutoThresh(:,o.AnchorChannel,o.ReferenceRound)*0.25;     %As Anchor Threshold seemed too high
+o.AutoThresh(:,o.AnchorChannel,o.AnchorRound) = o.AutoThresh(:,o.AnchorChannel,o.AnchorRound)*0.25;     %As Anchor Threshold seemed too high
 %parameters
 o.TileSz = 2048;
 
@@ -84,19 +82,17 @@ o.RegSearch.East.Y = -50:o.RegStep(1):50;
 o.RegSearch.East.X = -1900:o.RegStep(2):-1700;
 o.RegWidenSearch = [50,50]; 
 
+%If a channel or round is faulty, you can ignore it by selecting only the
+%good ones in o.UseChannels and o.UseRounds.
+o.nBP = 7;
+o.UseChannels = 1:o.nBP;
+o.UseRounds = 1:o.nRounds;
+
 %run code
 o = o.register2;
 save(fullfile(o.OutputDirectory, 'oRegister'), 'o', '-v7.3');
 
 %% find spots
-
-%parameters
-o.nBP = 7;
-
-%If a channel or round is faulty, you can ignore it by selecting only the
-%good ones in o.UseChannels and o.UseRounds.
-o.UseChannels = 1:o.nBP;
-o.UseRounds = 1:o.nRounds;
 
 %Search paramaters
 o.FindSpotsMinScore = 'auto';
@@ -109,8 +105,7 @@ o.FindSpotsSearch.X = -100:o.FindSpotsStep(2):100;
 %Make WidenSearch larger if you think you have a large shift between rounds
 o.FindSpotsWidenSearch = [50,50]; 
 
-o.PcDist = 3; 
-o.MinPCMatches = 1;    %HACK SO IT GETS TO THE END
+o.PcDist = 3;
 
 %run code
 o = o.find_spots2;
@@ -120,14 +115,19 @@ save(fullfile(o.OutputDirectory, 'oFind_spots'), 'o', '-v7.3');
 %run code
 o.CallSpotsCodeNorm = 'WholeCode';      %Other alternative is 'Round'
 o = o.call_spots;
-o = o.call_spots_prob;
+[o,LookupTable] = o.call_spots_prob;
 save(fullfile(o.OutputDirectory, 'oCall_spots'), 'o', '-v7.3');
+
+%Pixel based
+o = o.call_spots_pixel(LookupTable);
+save(fullfile(o.OutputDirectory, 'oCall_spots_pixel'), 'o', '-v7.3');
 
 %% plot results
 
 o.CombiQualThresh = 0.7;
-BigDapiImage = imread(o.BigDapiFile);
-o.plot(BigDapiImage);
+Roi = round([1, max(o.SpotGlobalYX(:,2)), ...
+1, max(o.SpotGlobalYX(:,1))]);
+o.plot(o.BigAnchorFile,Roi,'Prob');
 set(gca, 'YDir', 'reverse')
 set(gca, 'XDir', 'reverse')
 
