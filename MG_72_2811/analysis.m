@@ -1,9 +1,9 @@
 %% Load Data
-load(fullfile(pwd, 'latest-software-pixelbased.mat'));
+load(fullfile(pwd, 'o.mat'));
 Roi = round([1, max(o.SpotGlobalYX(:,2)), 1, max(o.SpotGlobalYX(:,1))]);
 
 %% Plot All Spots
-o.plot(o.BigDapiFile, Roi, 'Prob');
+o.plot(o.BigDapiFile, Roi, 'Pixel');
 set(gca, 'YDir', 'reverse')
 set(gca, 'XDir', 'reverse')
 
@@ -21,4 +21,4 @@ fclose(fp);
 GeneName(find(strcmp(GeneName, 'Ptk2b'))) = [];
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-iss_change_plot_MG(o,'Prob', GeneName)
+iss_change_plot_MG(o,'Pixel', GeneName)
