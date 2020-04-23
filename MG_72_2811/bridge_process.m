@@ -12,7 +12,7 @@ o.RawFileExtension = '.nd2';    %Format of raw data
 
 %% File Names
 %CHECK BEFORE EACH RUN
-o.InputDirectory = pwd;     %Folder path of raw data
+o.InputDirectory = fullfile(pwd, 'assets', 'data');     %Folder path of raw data
 
 %FileBase{r} is the file name of the raw data of round r in o.InputDirectory
 SliceNb = 'Round0-6_SplitAnchor00';
@@ -26,8 +26,8 @@ o.FileBase{6} = strcat(SliceNb, '6');
 o.FileBase{7} = strcat(SliceNb, '7');
 o.FileBase{8} = strcat(SliceNb, '8');    %Make sure the last round is the anchor
 
-o.TileDirectory = fullfile(pwd, SliceNb, 'tiles');
-o.OutputDirectory = fullfile(pwd, SliceNb, 'output');
+o.TileDirectory = fullfile(pwd, 'tmp', 'cache', 'tiles');
+o.OutputDirectory = fullfile(pwd, 'tmp', 'cache', 'output');
 %Codebook is a text file containing 2 columns - 1st is the gene name. 2nd is
 %the code, length o.nRounds and containing numbers in the range from 0 to o.nBP-1.
 o.CodeFile = fullfile('codebook_comb.txt');
@@ -53,7 +53,7 @@ o.MaxWaitTime1 = 60;      %Less time for round 1 incase name is wrong
 o.MaxWaitTime = 21600;  
 
 %run code
-o = o.extract_and_filter_NoGPU;
+o = o.extract_and_filter;
 save(fullfile(o.OutputDirectory, 'oExtract'), 'o', '-v7.3');
 
 %% register
@@ -119,6 +119,7 @@ o = o.call_spots;
 save(fullfile(o.OutputDirectory, 'oCall_spots'), 'o', '-v7.3');
 
 %Pixel based
+o.PixelFileMaxTiles = 3;
 o = o.call_spots_pixel(LookupTable);
 save(fullfile(o.OutputDirectory, 'oCall_spots_pixel'), 'o', '-v7.3');
 
