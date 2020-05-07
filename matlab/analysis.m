@@ -1,3 +1,21 @@
+%    This file is part of iss-microglia.
+%    Copyright (C) 2020  Emir Turkes
+%
+%    This program is free software: you can redistribute it and/or modify
+%    it under the terms of the GNU General Public License as published by
+%    the Free Software Foundation, either version 3 of the License, or
+%    (at your option) any later version.
+%
+%    This program is distributed in the hope that it will be useful,
+%    but WITHOUT ANY WARRANTY; without even the implied warranty of
+%    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%    GNU General Public License for more details.
+%
+%    You should have received a copy of the GNU General Public License
+%    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%
+%    Emir Turkes can be contacted at emir.turkes@eturkes.com
+
 %% Prep Data
 load(fullfile(pwd, 'o.mat'));
 Roi = round([1, max(o.SpotGlobalYX(:,2)), 1, max(o.SpotGlobalYX(:,1))]);
@@ -6,6 +24,7 @@ mkdir(fullfile('figures', 'latest-software-pixelbased'))
 
 %% Plot All Spots
 o.plot(o.BigDapiFile, Roi, 'Pixel');
+caxis([0,25000]);
 set(gca, 'YDir', 'reverse');
 set(gca, 'XDir', 'reverse');
 
@@ -40,13 +59,9 @@ iss_change_plot_MG(o,'Pixel', GeneNamesMGFilt);
 % saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'MG'), 'svg');
 
 %% MG Clusters
-% Must reload figure after calling iss_change_plot_MG().
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clf;
-o.plot(o.BigDapiFile, Roi, 'Pixel');
-set(gca, 'YDir', 'reverse')
-set(gca, 'XDir', 'reverse')
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+spots_to_cluster = find(ismember(o.GeneNames, GeneNamesMGFilt));
+spots_to_cluster = o.quality_threshold('Pixel') & ismember(o.pxSpotCodeNo, spots_to_cluster);
+SpotSetClustered = get_gene_clusters(o, 'Pixel', 150, 25, spots_to_cluster);
 
 iss_change_plot_MG(o, 'Pixel', GeneNamesMGFilt, SpotSetClustered);
 
@@ -54,14 +69,6 @@ iss_change_plot_MG(o, 'Pixel', GeneNamesMGFilt, SpotSetClustered);
 % saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'MG_clusters'), 'svg');
 
 %% Individual Genes
-% Must reload figure after calling iss_change_plot_MG().
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clf;
-o.plot(o.BigDapiFile, Roi, 'Pixel');
-set(gca, 'YDir', 'reverse')
-set(gca, 'XDir', 'reverse')
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 % For all genes.
 %%%%%%%%%%%%%%%%
 fp = fopen(fullfile('codebook_comb.txt'), 'r');
@@ -77,7 +84,7 @@ for i = 1:length(GeneNamesAll)
 %     saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'allgenes-individual', 'fig', ...
 %         GeneName{i}), 'fig');
 %     saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'allgenes-individual', 'svg', ...
-%         GeneName{i}), 'svg');
+%         GeneNamesAll{i}), 'svg');
 end
 %%%%%%%%%%%%%%%%
 
@@ -91,6 +98,6 @@ for i = 1:length(GeneNamesMG)
 %     saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'MG-individual', 'fig', ...
 %         GeneName{i}), 'fig');
 %     saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'MG-individual', 'svg', ...
-%         GeneName{i}), 'svg');
+%         GeneNamesMG{i}), 'svg');
 end
 %%%%%%%%%%%%%%%
