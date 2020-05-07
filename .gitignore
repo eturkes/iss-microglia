@@ -1,0 +1,5 @@
+# Objects and data backed up without version control
+/storage/
+
+# Temporary objects and data that are not backed up
+/cache/

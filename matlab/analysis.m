@@ -17,10 +17,8 @@
 %    Emir Turkes can be contacted at emir.turkes@eturkes.com
 
 %% Prep Data
-load(fullfile(pwd, 'o.mat'));
+load(fullfile('results', 'data', 'o.mat'));
 Roi = round([1, max(o.SpotGlobalYX(:,2)), 1, max(o.SpotGlobalYX(:,1))]);
-
-mkdir(fullfile('figures', 'latest-software-pixelbased'))
 
 %% Plot All Spots
 o.plot(o.BigDapiFile, Roi, 'Pixel');
@@ -28,20 +26,18 @@ caxis([0,25000]);
 set(gca, 'YDir', 'reverse');
 set(gca, 'XDir', 'reverse');
 
-% saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'allgenes'), 'fig');
-% saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'allgenes'), 'svg');
+saveas(gcf, fullfile('results', 'figures', 'allgenes'), 'svg');
 
 %% All Spots Clusters
 SpotSetClustered = get_gene_clusters(o, 'Pixel');
 iss_change_plot(o, 'Pixel', o.GeneNames, SpotSetClustered);
 
-% saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'allgenes_clusters'), 'fig');
-% saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'allgenes_clusters'), 'svg');
+saveas(gcf, fullfile('results', 'figures', 'allgenes_clusters'), 'svg');
 
 %% MG genes
 % Read in codebook.
 %%%%%%%%%%%%%%%%%%%
-fp = fopen(fullfile('codebook_Seppe.txt'), 'r');
+fp = fopen(fullfile('assets', 'codebooks', 'codebook_Seppe.txt'), 'r');
 tmp = textscan(fp, '%s %s', inf);
 GeneNamesMG = tmp{1};
 fclose(fp);
@@ -55,8 +51,7 @@ GeneNamesMGFilt(find(strcmp(GeneNamesMGFilt, 'Ptk2b'))) = [];
 
 iss_change_plot_MG(o,'Pixel', GeneNamesMGFilt);
 
-% saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'MG'), 'fig');
-% saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'MG'), 'svg');
+saveas(gcf, fullfile('results', 'figures', 'MG'), 'svg');
 
 %% MG Clusters
 spots_to_cluster = find(ismember(o.GeneNames, GeneNamesMGFilt));
@@ -65,8 +60,7 @@ SpotSetClustered = get_gene_clusters(o, 'Pixel', 150, 25, spots_to_cluster);
 
 iss_change_plot_MG(o, 'Pixel', GeneNamesMGFilt, SpotSetClustered);
 
-% saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'MG_clusters'), 'fig');
-% saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'MG_clusters'), 'svg');
+saveas(gcf, fullfile('results', 'figures', 'MG_clusters'), 'svg');
 
 %% Individual Genes
 % For all genes.
@@ -76,15 +70,10 @@ tmp = textscan(fp, '%s %s', inf);
 GeneNamesAll = tmp{1};
 fclose(fp);
 
-mkdir(fullfile('figures', 'latest-software-pixelbased', 'allgenes-individual'));
-
 for i = 1:length(GeneNamesAll)
     iss_change_plot_individual(o,'Pixel', GeneNamesAll(i));
 
-%     saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'allgenes-individual', 'fig', ...
-%         GeneName{i}), 'fig');
-%     saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'allgenes-individual', 'svg', ...
-%         GeneNamesAll{i}), 'svg');
+    saveas(gcf, fullfile('results', 'figures', 'allgenes-individual', GeneNamesAll{i}), 'svg');
 end
 %%%%%%%%%%%%%%%%
 
@@ -95,9 +84,6 @@ mkdir(fullfile('figures', 'latest-software-pixelbased', 'MG-individual'));
 for i = 1:length(GeneNamesMG)
     iss_change_plot_individual(o,'Pixel', GeneNamesMG(i));
 
-%     saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'MG-individual', 'fig', ...
-%         GeneName{i}), 'fig');
-%     saveas(gcf, fullfile('figures', 'latest-software-pixelbased', 'MG-individual', 'svg', ...
-%         GeneNamesMG{i}), 'svg');
+    saveas(gcf, fullfile('results', 'figures', 'MG-individual', GeneNamesMG{i}), 'svg');
 end
 %%%%%%%%%%%%%%%
