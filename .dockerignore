@@ -1,0 +1,12 @@
+.git
+matlab
+R
+assets
+COPYING
+docker-compose.yml
+.gitignore
+iss-microglia.Rproj
+NOTICE
+README.md
+results
+singularity.sh
