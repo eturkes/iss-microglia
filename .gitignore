@@ -3,3 +3,6 @@
 
 # Temporary objects and data that are not backed up
 /cache/
+
+# ISS source code which is tracked as a separate Git project
+/matlab/iss/
