@@ -1,5 +1,5 @@
 <!---
-    This file is part of iss-scripts.
+    This file is part of iss-microglia.
     Copyright (C) 2020  Emir Turkes
 
     This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,8 @@
     Emir Turkes can be contacted at emir.turkes@eturkes.com
 -->
 
-# ISS Scripts
-#### *These files are maintained to varying degrees*
+# ISS Microglia
+#### *This analysis is a work-in-progress*
 
-Repo for in-situ sequencing (ISS) scripts.  
+Repo for in-situ sequencing (ISS) analysis of microglia.  
 See here for source code of the primary software ([https://github.com/jduffield65/iss](https://github.com/jduffield65/iss)).
