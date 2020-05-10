@@ -65,10 +65,15 @@ The data here is derived from @`r unlist(strsplit(getwd(), "/"))[length(unlist(s
 
 # This section should be checked per document.
 # --------------------------------------------
-packages <- c("conflicted", "scater", "plotly", "scran", "pheatmap", "viridis")
+options(stringsAsFactors = FALSE)
+packages <- c(
+  "conflicted", "RColorBrewer", "GOSemSim", "GO.db", "ComplexHeatmap", "scater", "scran"
+)
 invisible(suppressPackageStartupMessages(lapply(packages, library, character.only = TRUE)))
 
-analysis_no <- 1
+analysis_no <- "01"
+color <- colorRampPalette(rev(brewer.pal(9, "RdBu")))(100)
+color2 <- colorRampPalette(rev(brewer.pal(9, "RdBu")))(50)
 # --------------------------------------------
 
 # Everything else in this chunk remains generally unchanged.
@@ -90,61 +95,75 @@ knitr::opts_chunk$set(fig.width = 10, fig.height = 7)
 
 ```{r}
 quickgo <- read.table(file.path(assets_dir, "gene-sets", "quickgo-BP.tsv"), TRUE, "\t")
-quickgo <- quickgo[ , c(6, 3)]
-mat <- as.data.frame.matrix(table(quickgo))
+quickgo <- quickgo[ , c(6, 5, 3)]
+genes <- unique(quickgo$SYMBOL)
+
+rds <- file.path(cache_dir, paste0(analysis_no, "_go_data.rds"))
+if (file.exists(rds)) {
+  go_data <- readRDS(rds)
+} else {
+  go_data <- godata("org.Mm.eg.db", "SYMBOL", "BP")
+  saveRDS(go_data, rds)
+}
+
+gene_anno <- go_data@geneAnno[go_data@geneAnno$SYMBOL %in% genes, ]
+rownames(gene_anno) <- NULL
+go_anno <- select(GO.db, gene_anno$GO, c("GOID", "TERM", "DEFINITION"), "GOID")
+gene_anno <- cbind(gene_anno, go_anno[ , -1])
+
+rds <- file.path(cache_dir, paste0(analysis_no, "_sem_sim.rds"))
+if (file.exists(rds)) {
+  sem_sim <- readRDS(rds)
+} else {
+  sem_sim <- mgeneSim(genes, go_data, drop = NULL, verbose = FALSE)
+  saveRDS(sem_sim, rds)
+}
+
+split <- 6
+heatmap <- Heatmap(
+  sem_sim, color, row_split = split, column_split = split, show_heatmap_legend = FALSE
+)
+draw(heatmap)
+
+mat <- as.data.frame.matrix(table(gene_anno[ , c(5, 1)]))
 mat <- as.matrix(mat)
 mat[mat > 0] = 1
-genes <- data.frame(genes = colnames(mat))
+mat <- mat[ , order(match(colnames(mat), colnames(sem_sim)))]
 
-sce <- SingleCellExperiment(list(logcounts = mat), colData = genes)
+sce <- SingleCellExperiment(list(logcounts = mat), colData = data.frame(genes = colnames(mat)))
 set.seed(1)
 sce <- runPCA(sce, ncomponents = 2)
-ggplotly(plotPCA(sce, colour_by = "genes"))
+plotly::ggplotly(plotPCA(sce, colour_by = "genes"))
 
-set.seed(1)
-g <- buildSNNGraph(sce, 2, use.dimred = "PCA")
-clusters <- igraph::cluster_walktrap(g)$membership
-sce$clusters <- as.factor(clusters)
-paste0(paste0("cluster", sce$clusters), "-", sce$genes)[order(
-  paste0(paste0("cluster", sce$clusters), "-", sce$genes)
-)]
-ggplotly(plotPCA(sce, colour_by = "clusters"))
+for (i in seq_along(column_order(heatmap))) {
+  if (i == 1) {
+    tmp <- colnames(sce)[column_order(heatmap)[[i]]]
+    clusters <- cbind(tmp, paste0("cluster", i))
+    colnames(clusters) <- c("gene", "cluster")
+  } else {
+    tmp <- colnames(sce)[column_order(heatmap)[[i]]]
+    tmp <- cbind(tmp, paste0("cluster", i))
+    clusters <- rbind(clusters, tmp)
+  }
+}
 
-markers <- findMarkers(
-  sce, groups = sce$clusters, direction = "up", test.type = "wilcox"
-)
+clusters <- as.data.frame(clusters)
+sce$clusters <- factor(clusters$cluster)
+plotly::ggplotly(plotPCA(sce, colour_by = "clusters"))
 
-markers_sub <- markers[[1]]
-markers_sub <- markers_sub[markers_sub$Top <= 5, ]
-AUC <- markers_sub[ , c(4:ncol(markers_sub))]
-pheatmap(
-  AUC, viridis(21), breaks = seq(0, 1, length.out = 21), cluster_cols = FALSE, main = "Cluster 1"
-)
+markers <- findMarkers(sce, groups = sce$clusters, direction = "up", test.type = "wilcox")
 
-markers_sub <- markers[[2]]
-markers_sub <- markers_sub[markers_sub$Top <= 5, ]
-AUC <- markers_sub[ , c(4:ncol(markers_sub))]
-pheatmap(
-  AUC, viridis(21), breaks = seq(0, 1, length.out = 21), cluster_cols = FALSE, main = "Cluster 2"
-)
-markers_sub <- markers[[3]]
-markers_sub <- markers_sub[markers_sub$Top <= 5, ]
-AUC <- markers_sub[ , c(4:ncol(markers_sub))]
-pheatmap(
-  AUC, viridis(21), breaks = seq(0, 1, length.out = 21), cluster_cols = FALSE, main = "Cluster 3"
-)
-markers_sub <- markers[[4]]
-markers_sub <- markers_sub[markers_sub$Top <= 5, ]
-AUC <- markers_sub[ , c(4:ncol(markers_sub))]
-pheatmap(
-  AUC, viridis(21), breaks = seq(0, 1, length.out = 21), cluster_cols = FALSE, main = "Cluster 4"
-)
-markers_sub <- markers[[5]]
-markers_sub <- markers_sub[markers_sub$Top <= 5, ]
-AUC <- markers_sub[ , c(4:ncol(markers_sub))]
-pheatmap(
-  AUC, viridis(21), breaks = seq(0, 1, length.out = 21), cluster_cols = FALSE, main = "Cluster 5"
-)
+for (i in seq_along(markers)) {
+  markers_sub <- markers[[i]]
+  markers_sub <- markers_sub[markers_sub$Top <= 5, ]
+  AUC <- as.matrix(markers_sub[ , c(4:ncol(markers_sub))])
+  draw(
+    Heatmap(
+      AUC, color2, row_names_max_width = max_text_width(rownames(AUC)),
+      show_heatmap_legend = FALSE, column_title = paste0("Cluster ", i), cluster_columns = FALSE
+    )
+  )
+}
 ```
 
 # References
