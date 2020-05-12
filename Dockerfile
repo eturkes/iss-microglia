@@ -25,6 +25,8 @@ COPY user-settings /home/rstudio/.rstudio/monitored/user-settings/
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     zlib1g-dev \
+    libxml2-dev \
+    libpng-dev \
  && Rscript \
     -e "install.packages('conflicted')" \
     -e "install.packages('peakRAM')" \
@@ -33,10 +35,12 @@ RUN apt-get update \
     -e "install.packages('knitr')" \
     -e "install.packages('data.table')" \
     -e "install.packages('DT')" \
-    -e "install.packages('plotly')" \
+    -e "install.packages('RColorBrewer')" \
     -e "install.packages('BiocManager')" \
-    -e "BiocManager::install('scater')" \
-    -e "BiocManager::install('scran')" \
+    -e "BiocManager::install('GOSemSim')" \
+    -e "BiocManager::install('org.Mm.eg.db')" \
+    -e "BiocManager::install('ComplexHeatmap')" \
+    -e "BiocManager::install('clusterProfiler')" \
  && apt-get clean \
  && rm -Rf \
     /var/lib/apt/lists/ \

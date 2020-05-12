@@ -66,14 +66,11 @@ The data here is derived from @`r unlist(strsplit(getwd(), "/"))[length(unlist(s
 # This section should be checked per document.
 # --------------------------------------------
 options(stringsAsFactors = FALSE)
-packages <- c(
-  "conflicted", "RColorBrewer", "GOSemSim", "GO.db", "ComplexHeatmap", "scater", "scran"
-)
+packages <- c("conflicted", "RColorBrewer", "GO.db", "GOSemSim", "ComplexHeatmap", "clusterProfiler")
 invisible(suppressPackageStartupMessages(lapply(packages, library, character.only = TRUE)))
 
 analysis_no <- "01"
 color <- colorRampPalette(rev(brewer.pal(9, "RdBu")))(100)
-color2 <- colorRampPalette(rev(brewer.pal(9, "RdBu")))(50)
 # --------------------------------------------
 
 # Everything else in this chunk remains generally unchanged.
@@ -94,9 +91,8 @@ knitr::opts_chunk$set(fig.width = 10, fig.height = 7)
 # Analysis
 
 ```{r}
-quickgo <- read.table(file.path(assets_dir, "gene-sets", "quickgo-BP.tsv"), TRUE, "\t")
-quickgo <- quickgo[ , c(6, 5, 3)]
-genes <- unique(quickgo$SYMBOL)
+genes <- read.table(file.path(assets_dir, "gene-sets", "MG-gene-symbols.txt"), FALSE, "\t")
+genes <- bitr(genes$V1, "SYMBOL", "ENTREZID", "org.Mm.eg.db")
 
 rds <- file.path(cache_dir, paste0(analysis_no, "_go_data.rds"))
 if (file.exists(rds)) {
@@ -106,7 +102,7 @@ if (file.exists(rds)) {
   saveRDS(go_data, rds)
 }
 
-gene_anno <- go_data@geneAnno[go_data@geneAnno$SYMBOL %in% genes, ]
+gene_anno <- go_data@geneAnno[go_data@geneAnno$SYMBOL %in% genes$SYMBOL, ]
 rownames(gene_anno) <- NULL
 go_anno <- select(GO.db, gene_anno$GO, c("GOID", "TERM", "DEFINITION"), "GOID")
 gene_anno <- cbind(gene_anno, go_anno[ , -1])
@@ -115,55 +111,31 @@ rds <- file.path(cache_dir, paste0(analysis_no, "_sem_sim.rds"))
 if (file.exists(rds)) {
   sem_sim <- readRDS(rds)
 } else {
-  sem_sim <- mgeneSim(genes, go_data, drop = NULL, verbose = FALSE)
+  sem_sim <- mgeneSim(genes$SYMBOL, go_data, drop = NULL, verbose = FALSE)
   saveRDS(sem_sim, rds)
 }
 
-split <- 6
+split <- 4
 heatmap <- Heatmap(
   sem_sim, color, row_split = split, column_split = split, show_heatmap_legend = FALSE
 )
 draw(heatmap)
 
-mat <- as.data.frame.matrix(table(gene_anno[ , c(5, 1)]))
-mat <- as.matrix(mat)
-mat[mat > 0] = 1
-mat <- mat[ , order(match(colnames(mat), colnames(sem_sim)))]
-
-sce <- SingleCellExperiment(list(logcounts = mat), colData = data.frame(genes = colnames(mat)))
-set.seed(1)
-sce <- runPCA(sce, ncomponents = 2)
-plotly::ggplotly(plotPCA(sce, colour_by = "genes"))
-
+clusters <- vector("list", length(column_order(heatmap)))
 for (i in seq_along(column_order(heatmap))) {
-  if (i == 1) {
-    tmp <- colnames(sce)[column_order(heatmap)[[i]]]
-    clusters <- cbind(tmp, paste0("cluster", i))
-    colnames(clusters) <- c("gene", "cluster")
-  } else {
-    tmp <- colnames(sce)[column_order(heatmap)[[i]]]
-    tmp <- cbind(tmp, paste0("cluster", i))
-    clusters <- rbind(clusters, tmp)
-  }
+  clusters[[i]] <- genes$ENTREZID[column_order(heatmap)[[i]]]
+  names(clusters)[i] <- paste0("cluster", i)
 }
 
-clusters <- as.data.frame(clusters)
-sce$clusters <- factor(clusters$cluster)
-plotly::ggplotly(plotPCA(sce, colour_by = "clusters"))
-
-markers <- findMarkers(sce, groups = sce$clusters, direction = "up", test.type = "wilcox")
-
-for (i in seq_along(markers)) {
-  markers_sub <- markers[[i]]
-  markers_sub <- markers_sub[markers_sub$Top <= 5, ]
-  AUC <- as.matrix(markers_sub[ , c(4:ncol(markers_sub))])
-  draw(
-    Heatmap(
-      AUC, color2, row_names_max_width = max_text_width(rownames(AUC)),
-      show_heatmap_legend = FALSE, column_title = paste0("Cluster ", i), cluster_columns = FALSE
-    )
-  )
+rds <- file.path(cache_dir, paste0(analysis_no, "_compare_clusters.rds"))
+if (file.exists(rds)) {
+  compare_clusters <- readRDS(rds)
+} else {
+  compare_clusters <- compareCluster(clusters, OrgDb = "org.Mm.eg.db", ont = "BP")
+  saveRDS(compare_clusters, rds)
 }
+
+dotplot(compare_clusters)
 ```
 
 # References

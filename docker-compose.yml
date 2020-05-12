@@ -20,13 +20,13 @@ version: "3"
 
 services:
   all:
-    image: eturkes/iss-microglia:R3.6.3v1
+    image: eturkes/iss-microglia:R3.6.3v2
     volumes:
       - ".:/home/rstudio/iss-microglia:rw"
     command: Rscript -e "source('/home/rstudio/iss-microglia/R/run_all.R')"
 
   rstudio:
-    image: eturkes/iss-microglia:R3.6.3v1
+    image: eturkes/iss-microglia:R3.6.3v2
     volumes:
       - ".:/home/rstudio/iss-microglia:rw"
     ports:
