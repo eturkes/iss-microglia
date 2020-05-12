@@ -20,7 +20,7 @@
 
 # Shell script for building a Singularity image from Docker Hub and running it.
 
-singularity pull tau-vulnerability.simg docker://eturkes/iss-microglia:R3.6.3v2
+singularity pull tau-vulnerability.simg docker://eturkes/iss-microglia:R3.6.3v3
 
 if [ "$1" = "all" ]; then
     singularity exec \
