@@ -98,14 +98,9 @@ rds <- file.path(cache_dir, paste0(analysis_no, "_go_data.rds"))
 if (file.exists(rds)) {
   go_data <- readRDS(rds)
 } else {
-  go_data <- godata("org.Mm.eg.db", "SYMBOL", "BP")
+  go_data <- godata("org.Mm.eg.db", "SYMBOL", "BP", FALSE)
   saveRDS(go_data, rds)
 }
-
-gene_anno <- go_data@geneAnno[go_data@geneAnno$SYMBOL %in% genes$SYMBOL, ]
-rownames(gene_anno) <- NULL
-go_anno <- select(GO.db, gene_anno$GO, c("GOID", "TERM", "DEFINITION"), "GOID")
-gene_anno <- cbind(gene_anno, go_anno[ , -1])
 
 rds <- file.path(cache_dir, paste0(analysis_no, "_sem_sim.rds"))
 if (file.exists(rds)) {
