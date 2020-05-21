@@ -47,6 +47,9 @@ fclose(fp);
 GeneNamesMGFilt = GeneNamesMG([4:6,8,9,13,14,20]); % MG specific genes.
 GeneNamesMGFilt2 = setdiff(GeneNamesMG, GeneNamesMGFilt); % Non-specific MG genes.
 
+iss_change_plot(o,'Pixel', GeneNamesMG);
+saveas(gcf, fullfile('results', 'figures', 'MG'), 'svg');
+
 iss_change_plot_MG(o,'Pixel', GeneNamesMG);
 saveas(gcf, fullfile('results', 'figures', 'MG', 'all'), 'svg');
 iss_change_plot_MG(o,'Pixel', GeneNamesMGFilt);
