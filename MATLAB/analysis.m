@@ -27,13 +27,25 @@ set(gca, 'YDir', 'reverse');
 set(gca, 'XDir', 'reverse');
 
 iss_change_plot(o,'Pixel');
-saveas(gcf, fullfile('results', 'figures', 'allgenes'), 'svg');
+saveas(gcf, fullfile('results', 'figures', 'allgenes', 'all'), 'png');
+iss_change_plot_allgenes_MG(o,'Pixel');
+saveas(gcf, fullfile('results', 'figures', 'allgenes', 'MG'), 'png');
+iss_change_plot_allgenes_MG2(o,'Pixel');
+saveas(gcf, fullfile('results', 'figures', 'allgenes', 'MG2'), 'png');
+iss_change_plot_allgenes_MG3(o,'Pixel');
+saveas(gcf, fullfile('results', 'figures', 'allgenes', 'MG3'), 'png');
 
 %% All Spots Clusters
 SpotSetClustered = get_gene_clusters(o, 'Pixel');
 
 iss_change_plot(o, 'Pixel', o.GeneNames, SpotSetClustered);
-saveas(gcf, fullfile('results', 'figures', 'allgenes_clusters'), 'svg');
+saveas(gcf, fullfile('results', 'figures', 'allgenes', 'clusters', 'all'), 'png');
+iss_change_plot_allgenes_MG(o, 'Pixel', o.GeneNames, SpotSetClustered);
+saveas(gcf, fullfile('results', 'figures', 'allgenes', 'clusters', 'MG'), 'png');
+iss_change_plot_allgenes_MG2(o, 'Pixel', o.GeneNames, SpotSetClustered);
+saveas(gcf, fullfile('results', 'figures', 'allgenes', 'clusters', 'MG2'), 'png');
+iss_change_plot_allgenes_MG3(o, 'Pixel', o.GeneNames, SpotSetClustered);
+saveas(gcf, fullfile('results', 'figures', 'allgenes', 'clusters', 'MG3'), 'png');
 
 %% MG genes
 % Read in codebook.
@@ -47,29 +59,29 @@ fclose(fp);
 GeneNamesMGFilt = GeneNamesMG([4:6,8,9,13,14,20]); % MG specific genes.
 GeneNamesMGFilt2 = setdiff(GeneNamesMG, GeneNamesMGFilt); % Non-specific MG genes.
 
-iss_change_plot(o,'Pixel', GeneNamesMG);
-saveas(gcf, fullfile('results', 'figures', 'MG'), 'svg');
+iss_change_plot_allgenes_MG3(o,'Pixel', GeneNamesMG);
+saveas(gcf, fullfile('results', 'figures', 'MG', 'all'), 'svg');
 
 iss_change_plot_MG(o,'Pixel', GeneNamesMG);
-saveas(gcf, fullfile('results', 'figures', 'MG', 'all'), 'svg');
+saveas(gcf, fullfile('results', 'figures', 'MG', 'MG', 'all'), 'svg');
 iss_change_plot_MG(o,'Pixel', GeneNamesMGFilt);
-saveas(gcf, fullfile('results', 'figures', 'MG', 'specific'), 'svg');
+saveas(gcf, fullfile('results', 'figures', 'MG', 'MG', 'specific'), 'svg');
 iss_change_plot_MG(o,'Pixel', GeneNamesMGFilt2);
-saveas(gcf, fullfile('results', 'figures', 'MG', 'non_specific'), 'svg');
+saveas(gcf, fullfile('results', 'figures', 'MG', 'MG', 'non-specific'), 'svg');
 
 iss_change_plot_MG2(o,'Pixel', GeneNamesMG);
-saveas(gcf, fullfile('results', 'figures', 'MG2', 'all'), 'svg');
+saveas(gcf, fullfile('results', 'figures', 'MG', 'MG2', 'all'), 'svg');
 iss_change_plot_MG2(o,'Pixel', GeneNamesMGFilt);
-saveas(gcf, fullfile('results', 'figures', 'MG2', 'specific'), 'svg');
+saveas(gcf, fullfile('results', 'figures', 'MG', 'MG2', 'specific'), 'svg');
 iss_change_plot_MG2(o,'Pixel', GeneNamesMGFilt2);
-saveas(gcf, fullfile('results', 'figures', 'MG2', 'non_specific'), 'svg');
+saveas(gcf, fullfile('results', 'figures', 'MG', 'MG2', 'non-specific'), 'svg');
 
 iss_change_plot_MG3(o,'Pixel', GeneNamesMG);
-saveas(gcf, fullfile('results', 'figures', 'MG3', 'all'), 'svg');
+saveas(gcf, fullfile('results', 'figures', 'MG', 'MG3', 'all'), 'svg');
 iss_change_plot_MG3(o,'Pixel', GeneNamesMGFilt);
-saveas(gcf, fullfile('results', 'figures', 'MG3', 'specific'), 'svg');
+saveas(gcf, fullfile('results', 'figures', 'MG', 'MG3', 'specific'), 'svg');
 iss_change_plot_MG3(o,'Pixel', GeneNamesMGFilt2);
-saveas(gcf, fullfile('results', 'figures', 'MG3', 'non_specific'), 'svg');
+saveas(gcf, fullfile('results', 'figures', 'MG', 'MG3', 'non-specific'), 'svg');
 
 %% MG Clusters
 spots_to_cluster = find(ismember(o.GeneNames, GeneNamesMG));
@@ -80,13 +92,13 @@ for i = 1:length(k)
     SpotSetClustered = get_gene_clusters(o, 'Pixel', 75, k(i), spots_to_cluster);
 
     iss_change_plot_MG(o, 'Pixel', GeneNamesMG, SpotSetClustered);
-    saveas(gcf, fullfile('results', 'figures', 'MG', 'all-clusters', ...
+    saveas(gcf, fullfile('results', 'figures', 'MG', 'MG', 'all', 'clusters', ...
         strcat('k', num2str(k(i)))), 'svg');
     iss_change_plot_MG2(o, 'Pixel', GeneNamesMG, SpotSetClustered);
-    saveas(gcf, fullfile('results', 'figures', 'MG2', 'all-clusters', ...
+    saveas(gcf, fullfile('results', 'figures', 'MG', 'MG2', 'all', 'clusters', ...
         strcat('k', num2str(k(i)))), 'svg');
     iss_change_plot_MG3(o, 'Pixel', GeneNamesMG, SpotSetClustered);
-    saveas(gcf, fullfile('results', 'figures', 'MG3', 'all-clusters', ...
+    saveas(gcf, fullfile('results', 'figures', 'MG', 'MG3', 'all', 'clusters', ...
         strcat('k', num2str(k(i)))), 'svg');
 end
 
@@ -98,13 +110,13 @@ for i = 1:length(k)
     SpotSetClustered = get_gene_clusters(o, 'Pixel', 75, k(i), spots_to_cluster);
 
     iss_change_plot_MG(o, 'Pixel', GeneNamesMG, SpotSetClustered);
-    saveas(gcf, fullfile('results', 'figures', 'MG', 'specific-clusters', ...
+    saveas(gcf, fullfile('results', 'figures', 'MG', 'MG', 'specific', 'clusters', ...
         strcat('k', num2str(k(i)))), 'svg');
     iss_change_plot_MG2(o, 'Pixel', GeneNamesMG, SpotSetClustered);
-    saveas(gcf, fullfile('results', 'figures', 'MG2', 'specific-clusters', ...
+    saveas(gcf, fullfile('results', 'figures', 'MG', 'MG2', 'specific', 'clusters', ...
         strcat('k', num2str(k(i)))), 'svg');
     iss_change_plot_MG3(o, 'Pixel', GeneNamesMG, SpotSetClustered);
-    saveas(gcf, fullfile('results', 'figures', 'MG3', 'specific-clusters', ...
+    saveas(gcf, fullfile('results', 'figures', 'MG', 'MG3', 'specific', 'clusters', ...
         strcat('k', num2str(k(i)))), 'svg');
 end
 
@@ -116,13 +128,13 @@ for i = 1:length(k)
     SpotSetClustered = get_gene_clusters(o, 'Pixel', 75, k(i), spots_to_cluster);
 
     iss_change_plot_MG(o, 'Pixel', GeneNamesMG, SpotSetClustered);
-    saveas(gcf, fullfile('results', 'figures', 'MG', 'non-specific-clusters', ...
+    saveas(gcf, fullfile('results', 'figures', 'MG', 'MG', 'non-specific', 'clusters', ...
         strcat('k', num2str(k(i)))), 'svg');
     iss_change_plot_MG2(o, 'Pixel', GeneNamesMG, SpotSetClustered);
-    saveas(gcf, fullfile('results', 'figures', 'MG2', 'non-specific-clusters', ...
+    saveas(gcf, fullfile('results', 'figures', 'MG', 'MG2', 'non-specific', 'clusters', ...
         strcat('k', num2str(k(i)))), 'svg');
     iss_change_plot_MG3(o, 'Pixel', GeneNamesMG, SpotSetClustered);
-    saveas(gcf, fullfile('results', 'figures', 'MG3', 'non-specific-clusters', ...
+    saveas(gcf, fullfile('results', 'figures', 'MG', 'MG3', 'non-specific', 'clusters', ...
         strcat('k', num2str(k(i)))), 'svg');
 end
 
@@ -136,7 +148,7 @@ fclose(fp);
 
 for i = 1:length(GeneNamesAll)
     iss_change_plot_individual(o,'Pixel', GeneNamesAll(i));
-    saveas(gcf, fullfile('results', 'figures', 'allgenes-individual', GeneNamesAll{i}), 'svg');
+    saveas(gcf, fullfile('results', 'figures', 'allgenes', 'individual', GeneNamesAll{i}), 'svg');
 end
 %%%%%%%%%%%%%%%%
 
@@ -144,6 +156,6 @@ end
 %%%%%%%%%%%%%%%
 for i = 1:length(GeneNamesMG)
     iss_change_plot_individual(o,'Pixel', GeneNamesMG(i));
-    saveas(gcf, fullfile('results', 'figures', 'MG-individual', GeneNamesMG{i}), 'svg');
+    saveas(gcf, fullfile('results', 'figures', 'MG', 'individual', GeneNamesMG{i}), 'svg');
 end
 %%%%%%%%%%%%%%%
