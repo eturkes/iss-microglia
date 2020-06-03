@@ -16,6 +16,11 @@
 %
 %    Emir Turkes can be contacted at emir.turkes@eturkes.com
 
+%% Template of a pipeline that links together all the different processes 
+%in the correct order.
+%The first two sections below will be different for each experiment so
+%should be checked before each run.
+
 %% Parameters that should be checked before each run
 %CHECK BEFORE EACH RUN
 
@@ -27,6 +32,7 @@ o.InitialShiftChannel = 7;      %Channel to use to find initial shifts between r
 o.ReferenceRound = 8;           %Index of anchor round
 o.ReferenceChannel = 7;         %o.ReferenceChannel. If RefRound = AnchorRound, this has to be AnchorChannel.
 o.RawFileExtension = '.nd2';    %Format of raw data
+o.LogToFile = 1;                %Set to 1 if you want to save command window to txt file, else set to 0.
 
 %% File Names
 %CHECK BEFORE EACH RUN
@@ -49,6 +55,13 @@ o.OutputDirectory = fullfile('cache', 'output');
 %Codebook is a text file containing 2 columns - 1st is the gene name. 2nd is
 %the code, length o.nRounds and containing numbers in the range from 0 to o.nBP-1.
 o.CodeFile = fullfile('assets', 'codebooks', 'codebook_comb.txt');
+
+%% Logging
+if o.LogToFile
+    if isempty(o.LogFile)
+        o.LogFile = fullfile(o.OutputDirectory,'Log.txt');
+    end
+end
 
 %% extract and filter
 
