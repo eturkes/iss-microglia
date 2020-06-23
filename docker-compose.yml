@@ -1,5 +1,5 @@
 #    This file is part of iss-microglia.
-#    Copyright 2020 (C)  Emir Turkes, Sebastiaan De Schepper, UK DRI at UCL
+#    Copyright (C) 2020  Emir Turkes, Sebastiaan De Schepper, UK DRI at UCL
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
