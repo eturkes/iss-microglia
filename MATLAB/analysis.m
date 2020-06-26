@@ -84,8 +84,8 @@ iss_change_plot_MG3(o,'Pixel', GeneNamesMGFilt2);
 saveas(gcf, fullfile('results', 'figures', 'MG', 'MG3', 'non-specific'), 'svg');
 
 %% MG Clusters
-spots_to_cluster = find(ismember(o.GeneNames, GeneNamesMG));
-spots_to_cluster = o.quality_threshold('Pixel') & ismember(o.pxSpotCodeNo, spots_to_cluster);
+spot_no = find(ismember(o.GeneNames, GeneNamesMG));
+spots_to_cluster = o.quality_threshold('Pixel') & ismember(o.pxSpotCodeNo, spot_no);
 k = [2;3;5;10;15;25;50];
 
 for i = 1:length(k)
@@ -147,7 +147,7 @@ GeneNamesAll = tmp{1};
 fclose(fp);
 
 for i = 1:length(GeneNamesAll)
-    iss_change_plot_individual(o,'Pixel', GeneNamesAll(i));
+    iss_change_plot_individual(o, 'Pixel', GeneNamesAll(i));
     saveas(gcf, fullfile('results', 'figures', 'allgenes', 'individual', GeneNamesAll{i}), 'svg');
 end
 %%%%%%%%%%%%%%%%
@@ -155,7 +155,54 @@ end
 % For MG genes.
 %%%%%%%%%%%%%%%
 for i = 1:length(GeneNamesMG)
-    iss_change_plot_individual(o,'Pixel', GeneNamesMG(i));
+    iss_change_plot_individual(o, 'Pixel', GeneNamesMG(i));
     saveas(gcf, fullfile('results', 'figures', 'MG', 'individual', GeneNamesMG{i}), 'svg');
 end
 %%%%%%%%%%%%%%%
+
+%% Spatial Cross-correlation
+genes = {'Synpr', 'Wfs1'};
+spot_no = find(ismember(o.GeneNames, genes));
+thresh = o.quality_threshold('Pixel') & ismember(o.pxSpotCodeNo, spot_no);
+
+spots = o.pxSpotGlobalYX(thresh,:);
+codes = o.pxSpotCodeNo(thresh,:);
+subset = size(spots);
+rng(1);
+subset = randsample(subset(1), subset(1));
+sub_spots = spots(subset,:);
+sub_codes = codes(subset,:);
+
+SpotSet = o.quality_threshold('Pixel') & ismember(o.pxSpotGlobalYX, sub_spots, 'rows');
+iss_change_plot(o, 'Pixel', GeneNamesAll, SpotSet);
+
+genes = 'Synpr';
+spot_no = find(ismember(o.GeneNames, genes));
+[~, groups] = ismember(sub_codes, spot_no);
+groups = groups + 1;
+[ccg_out, Pairs, gs, cum_dens, rel_cum_dens, ripley, local_density] = ...
+    CCG_2d(sub_spots, groups, 75, 16);
+
+scatter(ccg_out(:,1,1), ccg_out(:,2,1));
+hold on;
+scatter(ccg_out(:,2,2), ccg_out(:,1,2));
+
+bar(ccg_out(:,1,1));
+hold on;
+bar(ccg_out(:,2,2));
+
+bar(cum_dens(:,1,1));
+hold on;
+bar(cum_dens(:,2,2));
+
+bar(rel_cum_dens(:,1,1));
+hold on;
+bar(rel_cum_dens(:,2,2));
+
+bar(ripley(:,1,1));
+hold on;
+bar(ripley(:,2,2));
+
+bar(local_density(:,1,1));
+hold on;
+bar(local_density(:,2,2));
