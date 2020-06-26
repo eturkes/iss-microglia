@@ -1,6 +1,8 @@
 function [ccg_out, Pairs, gs, cum_dens, rel_cum_dens, ripley, local_density] = CCG_2d(v0, G0, MaxDist, nBins, gs)
 % [ccg, Pairs, gs, cum_dens, rel_cum_dens, ripley] = CCG_2d(v, G, MaxDist, nBins, GSubset)
 % constructs a radial 2d cross-correlogram assuming circular symmetry
+%
+% Written by Kenneth D. Harris
 % 
 % xv is a Nx2 array giving the x and y coordinates of each point
 % G says which point is in which group.
