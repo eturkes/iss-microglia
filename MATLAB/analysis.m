@@ -181,7 +181,7 @@ spot_no = find(ismember(o.GeneNames, genes));
 [~, groups] = ismember(sub_codes, spot_no);
 groups = groups + 1;
 [ccg_out, Pairs, gs, cum_dens, rel_cum_dens, ripley, local_density] = ...
-    CCG_2d(sub_spots, groups, 75, 16);
+    CCG_2d(sub_spots, groups, 200, 30);
 
 scatter(ccg_out(:,1,1), ccg_out(:,2,1));
 hold on;
