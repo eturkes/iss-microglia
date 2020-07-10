@@ -206,3 +206,90 @@ bar(ripley(:,2,2));
 bar(local_density(:,1,1));
 hold on;
 bar(local_density(:,2,2));
+
+%% Contour Plots
+genes = {'Csf1r'};
+genes = {'Tmem119', 'P2ry12', 'Cx3cr1'};
+genes = {'C1qB', 'C1qC', 'C1qa', 'Olfml3'};
+spot_no = find(ismember(o.GeneNames, genes));
+thresh = o.quality_threshold('Pixel') & ismember(o.pxSpotCodeNo, spot_no);
+
+spots = o.pxSpotGlobalYX(thresh,:);
+codes = o.pxSpotCodeNo(thresh,:);
+subset = size(spots);
+rng(1);
+subset = randsample(subset(1), subset(1));
+sub_spots = spots(subset,:);
+
+% The following section is adapted from content on Stack Overflow.
+% https://stackoverflow.com/questions/9134014/contour-plot-coloured-by-clustering-of-points-matlab
+% Question asked by: HCAI https://stackoverflow.com/users/1134241/hcai
+% Answer given by: Vidar https://stackoverflow.com/users/346645/vidar
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Border = 0;
+Sigma = 500;
+stepSize = 100;
+
+X=(sub_spots(:,2) / 1)';
+Y=(sub_spots(:,1) / 1)';
+D = [X' Y'];
+N = length(X);
+
+Xrange = [min(X)-Border max(X)+Border];
+Yrange = [min(Y)-Border max(Y)+Border];
+
+% Set up coordinate grid.
+%%%%%%%%%%%%%%%%%%%%%%%%%
+[XX, YY] = meshgrid(Xrange(1):stepSize:Xrange(2), Yrange(1):stepSize:Yrange(2));
+YY = flipud(YY);
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Parzen parameters and function handle.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+pf1 = @(C1,C2) (1/N)*(1/((2*pi)*Sigma^2)).* ...
+         exp(-( (C1(1)-C2(1))^2+ (C1(2)-C2(2))^2)/(2*Sigma^2));
+
+PPDF1 = zeros(size(XX));
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Populate coordinate surface.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+[R, C] = size(PPDF1);
+NN = length(D);
+for c = 1:C
+   for r = 1:R
+       for d = 1:N
+            PPDF1(r,c) = PPDF1(r,c) + ...
+                pf1([XX(1,c) YY(r,1)], [D(d,1) D(d,2)]);
+       end
+   end
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Normalize data.
+%%%%%%%%%%%%%%%%%
+m1 = max(PPDF1(:));
+PPDF1 = PPDF1 / m1;
+%%%%%%%%%%%%%%%%%
+
+% Set up visualization.
+%%%%%%%%%%%%%%%%%%%%%%%
+set(0, 'defaulttextinterpreter', 'latex', 'DefaultAxesFontSize', 20)
+fig = figure(1);
+clf
+stem3(D(:,1), D(:,2), zeros(N,1), 'b.');
+hold on;
+%%%%%%%%%%%%%%%%%%%%%%%
+
+% Add PDF estimates to figure.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+s1 = surfc(XX, YY, PPDF1);
+shading interp;
+alpha(s1, 'color');
+sub1 = gca;
+view(2)
+axis([Xrange(1) Xrange(2) Yrange(1) Yrange(2)])
+set(gca, 'YDir', 'reverse');
+set(gca, 'XDir', 'reverse');
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
