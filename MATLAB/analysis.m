@@ -208,20 +208,82 @@ hold on;
 bar(local_density(:,2,2));
 
 %% Contour Plots
-% For all genes.
-%%%%%%%%%%%%%%%%
+% All genes individual.
+%%%%%%%%%%%%%%%%%%%%%%%
 for i = 1:length(GeneNamesAll)
     iss_change_plot_contour(o, 'Pixel', GeneNamesAll(i));
     saveas(gcf, fullfile('results', 'figures', 'contour', 'allgenes', 'individual', ...
         GeneNamesAll{i}), 'svg');
 end
-%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%
 
-% For MG genes.
-%%%%%%%%%%%%%%%
+% MG genes individual.
+%%%%%%%%%%%%%%%%%%%%%%
 for i = 1:length(GeneNamesMG)
     iss_change_plot_contour(o, 'Pixel', GeneNamesMG(i));
     saveas(gcf, fullfile('results', 'figures', 'contour', 'MG', 'individual', ...
         GeneNamesMG{i}), 'svg');
 end
-%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%
+
+% MG all.
+%%%%%%%%%
+iss_change_plot_MG2_contour(o, 'Pixel', GeneNamesMG);
+saveas(gcf, fullfile('results', 'figures', 'contour', 'MG', 'all'), 'svg');
+iss_change_plot_MG2_contour(o, 'Pixel', GeneNamesMGFilt);
+saveas(gcf, fullfile('results', 'figures', 'contour', 'MG', 'specific'), 'svg');
+iss_change_plot_MG2_contour(o, 'Pixel', GeneNamesMGFilt2);
+saveas(gcf, fullfile('results', 'figures', 'contour', 'MG', 'non-specific'), 'svg');
+%%%%%%%%%
+
+% MG clusters all.
+%%%%%%%%%%%%%%%%%%
+genes = {'Laptm5', 'Sparc', 'Csf1r', 'Ptk2b'};
+iss_change_plot_MG2_contour(o, 'Pixel', genes);
+saveas(gcf, fullfile('results', 'figures', 'contour', 'MG', 'clusters', 'all', 'c1'), 'svg');
+
+genes = {'Grn', 'Tmem119', 'Bin1', 'Cyfip1', 'Plcg2', 'P2ry12', 'Ccr5', 'Cx3cr1'};
+iss_change_plot_MG2_contour(o, 'Pixel', genes);
+saveas(gcf, fullfile('results', 'figures', 'contour', 'MG', 'clusters', 'all', 'c2'), 'svg');
+
+genes = {'C1qB', 'C1qC', 'C1qa', 'Olfml3'};
+iss_change_plot_MG2_contour(o, 'Pixel', genes);
+saveas(gcf, fullfile('results', 'figures', 'contour', 'MG', 'clusters', 'all', 'c3'), 'svg');
+
+genes = {'Pld3', 'Pld4', 'Bin2', 'Atp6v0d2'};
+iss_change_plot_MG2_contour(o, 'Pixel', genes);
+saveas(gcf, fullfile('results', 'figures', 'contour', 'MG', 'clusters', 'all', 'c4'), 'svg');
+%%%%%%%%%%%%%%%%%%
+
+% MG clusters specific.
+%%%%%%%%%%%%%%%%%%%%%%%
+genes = {'Csf1r'};
+iss_change_plot_MG2_contour(o, 'Pixel', genes);
+saveas(gcf, fullfile('results', 'figures', 'contour', 'MG', 'clusters', 'specific', 'c1'), 'svg');
+
+genes = {'Tmem119', 'P2ry12', 'Cx3cr1'};
+iss_change_plot_MG2_contour(o, 'Pixel', genes);
+saveas(gcf, fullfile('results', 'figures', 'contour', 'MG', 'clusters', 'specific', 'c2'), 'svg');
+
+genes = {'C1qB', 'C1qC', 'C1qa', 'Olfml3'};
+iss_change_plot_MG2_contour(o, 'Pixel', genes);
+saveas(gcf, fullfile('results', 'figures', 'contour', 'MG', 'clusters', 'specific', 'c3'), 'svg');
+%%%%%%%%%%%%%%%%%%%%%%%
+
+% MG clusters non-specific.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+genes = {'Laptm5', 'Sparc','Ptk2b'};
+iss_change_plot_MG2_contour(o, 'Pixel', genes);
+saveas(gcf, fullfile('results', 'figures', 'contour', 'MG', 'clusters', 'non-specific', 'c1'), ...
+    'svg');
+
+genes = {'Grn', 'Bin1', 'Cyfip1', 'Plcg2', 'Ccr5'};
+iss_change_plot_MG2_contour(o, 'Pixel', genes);
+saveas(gcf, fullfile('results', 'figures', 'contour', 'MG', 'clusters', 'non-specific', 'c2'), ...
+    'svg');
+
+genes = {'Pld3', 'Pld4', 'Bin2', 'Atp6v0d2'};
+iss_change_plot_MG2_contour(o, 'Pixel', genes);
+saveas(gcf, fullfile('results', 'figures', 'contour', 'MG', 'clusters', 'non-specific', 'c4'), ...
+    'svg');
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
