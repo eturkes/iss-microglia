@@ -20,6 +20,22 @@
 load(fullfile('results', 'data', 'o.mat'));
 Roi = round([1, max(o.SpotGlobalYX(:,2)), 1, max(o.SpotGlobalYX(:,1))]);
 
+% Make codebook subsets.
+%%%%%%%%%%%%%%%%%%%%%%%%
+fp = fopen(fullfile('codebook_comb.txt'), 'r');
+tmp = textscan(fp, '%s %s', inf);
+GeneNamesAll = tmp{1};
+fclose(fp);
+
+fp = fopen(fullfile('assets', 'codebooks', 'codebook_Seppe.txt'), 'r');
+tmp = textscan(fp, '%s %s', inf);
+GeneNamesMG = tmp{1};
+fclose(fp);
+
+GeneNamesMGFilt = GeneNamesMG([4:6,8,9,13,14,20]); % MG specific genes.
+GeneNamesMGFilt2 = setdiff(GeneNamesMG, GeneNamesMGFilt); % Non-specific MG genes.
+%%%%%%%%%%%%%%%%%%%%%%%%
+
 %% Plot All Spots
 o.plot(o.BigDapiFile, Roi, 'Pixel');
 caxis([0,25000]);
@@ -48,17 +64,6 @@ iss_change_plot_allgenes_MG3(o, 'Pixel', o.GeneNames, SpotSetClustered);
 saveas(gcf, fullfile('results', 'figures', 'allgenes', 'clusters', 'MG3'), 'png');
 
 %% MG genes
-% Read in codebook.
-%%%%%%%%%%%%%%%%%%%
-fp = fopen(fullfile('assets', 'codebooks', 'codebook_Seppe.txt'), 'r');
-tmp = textscan(fp, '%s %s', inf);
-GeneNamesMG = tmp{1};
-fclose(fp);
-%%%%%%%%%%%%%%%%%%%
-
-GeneNamesMGFilt = GeneNamesMG([4:6,8,9,13,14,20]); % MG specific genes.
-GeneNamesMGFilt2 = setdiff(GeneNamesMG, GeneNamesMGFilt); % Non-specific MG genes.
-
 iss_change_plot_allgenes_MG3(o,'Pixel', GeneNamesMG);
 saveas(gcf, fullfile('results', 'figures', 'MG', 'all'), 'svg');
 
@@ -141,11 +146,6 @@ end
 %% Individual Genes
 % For all genes.
 %%%%%%%%%%%%%%%%
-fp = fopen(fullfile('codebook_comb.txt'), 'r');
-tmp = textscan(fp, '%s %s', inf);
-GeneNamesAll = tmp{1};
-fclose(fp);
-
 for i = 1:length(GeneNamesAll)
     iss_change_plot_individual(o, 'Pixel', GeneNamesAll(i));
     saveas(gcf, fullfile('results', 'figures', 'allgenes', 'individual', GeneNamesAll{i}), 'svg');
