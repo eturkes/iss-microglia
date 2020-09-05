@@ -5,7 +5,7 @@
 /cache/
 
 # ISS source code which is tracked as a separate Git project
-/MATLAB/iss/
+/MATLAB/iss
 
 # Container files
 *.simg
