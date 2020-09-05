@@ -36,7 +36,7 @@ o.LogToFile = 1;                %Set to 1 if you want to save command window to 
 
 %% File Names
 %CHECK BEFORE EACH RUN
-o.InputDirectory = fullfile('assets', 'data');     %Folder path of raw data
+o.InputDirectory = fullfile('assets', 'data', 'pilot');     %Folder path of raw data
 
 %FileBase{r} is the file name of the raw data of round r in o.InputDirectory
 SliceNb = 'Round0-6_SplitAnchor00';
@@ -50,11 +50,11 @@ o.FileBase{6} = strcat(SliceNb, '6');
 o.FileBase{7} = strcat(SliceNb, '7');
 o.FileBase{8} = strcat(SliceNb, '8');    %Make sure the last round is the anchor
 
-o.TileDirectory = fullfile('cache', 'tiles');
-o.OutputDirectory = fullfile('cache', 'output');
+o.TileDirectory = fullfile('cache', 'pilot', 'tiles');
+o.OutputDirectory = fullfile('cache', 'pilot', 'output');
 %Codebook is a text file containing 2 columns - 1st is the gene name. 2nd is
 %the code, length o.nRounds and containing numbers in the range from 0 to o.nBP-1.
-o.CodeFile = fullfile('assets', 'codebooks', 'codebook_comb.txt');
+o.CodeFile = fullfile('assets', 'codebooks', 'pilot', 'codebook_comb.txt');
 
 %% Logging
 if o.LogToFile
