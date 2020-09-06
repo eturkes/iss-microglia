@@ -23,13 +23,12 @@
 
 %% Parameters that should be checked before each run
 %CHECK BEFORE EACH RUN
-
 o = iss;
 o.AnchorRound = 8;              %Round that contains Dapi image
-o.AnchorChannel =  7;            %Channel that has most spots in anchor round (o.ReferenceRound)
-o.DapiChannel = 1;              %Channel in anchor round that contains Dapi images
+o.AnchorChannel =  7;            %Channel that has most spots in o.AnchorRound
+o.DapiChannel = 1;              %Channel in o.AnchorRound that contains Dapi images
 o.InitialShiftChannel = 7;      %Channel to use to find initial shifts between rounds
-o.ReferenceRound = 8;           %Index of anchor round
+o.ReferenceRound = 8;           %Global coordinate system is built upon o.ReferenceRound and
 o.ReferenceChannel = 7;         %o.ReferenceChannel. If RefRound = AnchorRound, this has to be AnchorChannel.
 o.RawFileExtension = '.nd2';    %Format of raw data
 o.LogToFile = 1;                %Set to 1 if you want to save command window to txt file, else set to 0.
@@ -160,10 +159,8 @@ o = o.call_spots;
 save(fullfile(o.OutputDirectory, 'oCall_spots'), 'o', '-v7.3');
 
 %Pixel based
-o.PixelFileMaxTiles = 3;
 o = o.call_spots_pixel(LookupTable);
 save(fullfile(o.OutputDirectory, 'oCall_spots_pixel'), 'o', '-v7.3');
-
 %% plot results
 
 o.CombiQualThresh = 0.7;
