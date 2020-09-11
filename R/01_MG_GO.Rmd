@@ -123,6 +123,7 @@ nbclust <- fviz_nbclust(
 nbclust
 
 split <- which.max(nbclust$data$y)
+set.seed(1)
 heatmap <- Heatmap(
   sem_sim, color, row_split = split, column_split = split, show_heatmap_legend = FALSE
 )
@@ -179,6 +180,7 @@ nbclust
 
 ```{r, fig.width = 15, fig.height = 15}
 split <- which.max(nbclust$data$y)
+set.seed(1)
 heatmap <- Heatmap(
   sem_sim, color, row_split = split,
   column_split = split, show_heatmap_legend = FALSE, row_names_gp = gpar(fontsize = 8),
