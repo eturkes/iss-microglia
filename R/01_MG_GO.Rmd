@@ -67,7 +67,8 @@ The data here is derived from @`r unlist(strsplit(getwd(), "/"))[length(unlist(s
 # --------------------------------------------
 options(stringsAsFactors = FALSE)
 packages <- c(
-  "conflicted", "RColorBrewer", "GO.db", "GOSemSim", "ComplexHeatmap", "clusterProfiler"
+  "conflicted", "RColorBrewer", "GO.db", "GOSemSim", "ComplexHeatmap", "clusterProfiler", "cluster",
+  "factoextra"
 )
 invisible(suppressPackageStartupMessages(lapply(packages, library, character.only = TRUE)))
 
@@ -116,7 +117,12 @@ if (file.exists(rds)) {
   saveRDS(sem_sim, rds)
 }
 
-split <- 4
+nbclust <- fviz_nbclust(
+  sem_sim, kmeans, k.max = nrow(sem_sim) / 2, print.summary = FALSE, verbose = FALSE
+)
+nbclust
+
+split <- which.max(nbclust$data$y)
 heatmap <- Heatmap(
   sem_sim, color, row_split = split, column_split = split, show_heatmap_legend = FALSE
 )
@@ -141,7 +147,7 @@ dotplot(compare_clusters)
 
 # NLF
 
-```{r, fig.width = 15, fig.height = 15}
+```{r}
 run <- "NLF"
 
 genes <- read.table(
@@ -165,7 +171,14 @@ if (file.exists(rds)) {
   saveRDS(sem_sim, rds)
 }
 
-split <- 8
+nbclust <- fviz_nbclust(
+  sem_sim, kmeans, k.max = nrow(sem_sim) / 4, print.summary = FALSE, verbose = FALSE
+)
+nbclust
+```
+
+```{r, fig.width = 15, fig.height = 15}
+split <- which.max(nbclust$data$y)
 heatmap <- Heatmap(
   sem_sim, color, row_split = split,
   column_split = split, show_heatmap_legend = FALSE, row_names_gp = gpar(fontsize = 8),
