@@ -88,13 +88,17 @@ knitr::opts_chunk$set(fig.width = 10, fig.height = 7)
 # ----------------------------------------------------------
 ```
 
-# Analysis
+# Pilot
 
 ```{r}
-genes <- read.table(file.path(assets_dir, "gene-sets", "MG-gene-symbols.txt"), FALSE, "\t")
+run <- "pilot"
+
+genes <- read.table(
+  file.path(assets_dir, "gene-sets", paste0("MG-gene-symbols-", run, ".txt")), FALSE, "\t"
+)
 genes <- bitr(genes$V1, "SYMBOL", "ENTREZID", "org.Mm.eg.db")
 
-rds <- file.path(cache_dir, paste0(analysis_no, "_go_data.rds"))
+rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_go_data.rds"))
 if (file.exists(rds)) {
   go_data <- readRDS(rds)
 } else {
@@ -102,7 +106,7 @@ if (file.exists(rds)) {
   saveRDS(go_data, rds)
 }
 
-rds <- file.path(cache_dir, paste0(analysis_no, "_sem_sim.rds"))
+rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_sem_sim.rds"))
 if (file.exists(rds)) {
   sem_sim <- readRDS(rds)
 } else {
@@ -122,7 +126,58 @@ for (i in seq_along(column_order(heatmap))) {
   names(clusters)[i] <- paste0("cluster", i)
 }
 
-rds <- file.path(cache_dir, paste0(analysis_no, "_compare_clusters.rds"))
+rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_compare_clusters.rds"))
+if (file.exists(rds)) {
+  compare_clusters <- readRDS(rds)
+} else {
+  compare_clusters <- compareCluster(clusters, OrgDb = "org.Mm.eg.db", ont = "BP")
+  saveRDS(compare_clusters, rds)
+}
+
+dotplot(compare_clusters)
+```
+
+# NLF
+
+```{r, fig.width = 15, fig.height = 15}
+run <- "NLF"
+
+genes <- read.table(
+  file.path(assets_dir, "gene-sets", paste0("MG-gene-symbols-", run, ".txt")), FALSE, "\t"
+)
+genes <- bitr(genes$V1, "SYMBOL", "ENTREZID", "org.Mm.eg.db")
+
+rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_go_data.rds"))
+if (file.exists(rds)) {
+  go_data <- readRDS(rds)
+} else {
+  go_data <- godata("org.Mm.eg.db", "SYMBOL", "BP", FALSE)
+  saveRDS(go_data, rds)
+}
+
+rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_sem_sim.rds"))
+if (file.exists(rds)) {
+  sem_sim <- readRDS(rds)
+} else {
+  sem_sim <- mgeneSim(genes$SYMBOL, go_data, drop = NULL, verbose = FALSE)
+  saveRDS(sem_sim, rds)
+}
+
+split <- 8
+heatmap <- Heatmap(
+  sem_sim, color, row_split = split,
+  column_split = split, show_heatmap_legend = FALSE, row_names_gp = gpar(fontsize = 8),
+  column_names_gp = gpar(fontsize = 8)
+)
+draw(heatmap)
+
+clusters <- vector("list", length(column_order(heatmap)))
+for (i in seq_along(column_order(heatmap))) {
+  clusters[[i]] <- genes$ENTREZID[column_order(heatmap)[[i]]]
+  names(clusters)[i] <- paste0("cluster", i)
+}
+
+rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_compare_clusters.rds"))
 if (file.exists(rds)) {
   compare_clusters <- readRDS(rds)
 } else {
