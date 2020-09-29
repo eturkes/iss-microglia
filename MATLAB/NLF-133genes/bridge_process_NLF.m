@@ -157,7 +157,7 @@ save(fullfile(o.OutputDirectory, 'oFind_spots'), 'o', '-v7.3');
 o.CallSpotsCodeNorm = 'WholeCode';      %Other alternative is 'Round'
 o = o.call_spots;
 % [o,LookupTable] = o.call_spots_prob;
-% save(fullfile(o.OutputDirectory, 'oCall_spots'), 'o', '-v7.3');
+save(fullfile(o.OutputDirectory, 'oCall_spots'), 'o', '-v7.3');
 
 %Pixel based
 % o = o.call_spots_pixel(LookupTable);
@@ -165,8 +165,8 @@ o = o.call_spots;
 %% plot results
 
 % o.CombiQualThresh = 0.7;
-% Roi = round([1, max(o.SpotGlobalYX(:,2)), ...
-% 1, max(o.SpotGlobalYX(:,1))]);
+Roi = round([1, max(o.SpotGlobalYX(:,2)), ...
+1, max(o.SpotGlobalYX(:,1))]);
 % o.plot(o.BigAnchorFile,Roi,'Prob');
 %o.plot(o.BigAnchorFile,Roi,'Pixel');
 o.plot(o.BigAnchorFile, Roi, 'DotProduct');
