@@ -101,10 +101,10 @@ knitr::opts_chunk$set(fig.width = 10, fig.height = 7)
 ```{r}
 run <- "pilot"
 
-genes <- read.table(
+genes_orig <- read.table(
   file.path(assets_dir, "gene-sets", paste0("MG-gene-symbols-", run, ".txt")), FALSE, "\t"
 )
-genes <- bitr(genes$V1, "SYMBOL", "ENTREZID", "org.Mm.eg.db")
+genes <- bitr(genes_orig$V1, "SYMBOL", "ENTREZID", "org.Mm.eg.db")
 
 rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_go_data.rds"))
 if (file.exists(rds)) {
@@ -139,8 +139,8 @@ if (file.exists(rds)) {
   )
   saveRDS(nbclust, rds)
 }
-split <- maxSE(nbclust$Tab[ , "gap"], nbclust$Tab[ , "SE.sim"], "globalSEmax")
-fviz_gap_stat(nbclust, maxSE = list(method = "globalSEmax"))
+split <- maxSE(nbclust$Tab[ , "gap"], nbclust$Tab[ , "SE.sim"], "firstmax")
+fviz_gap_stat(nbclust, maxSE = list(method = "firstmax"))
 
 set.seed(1)
 heatmap <- Heatmap(
@@ -164,7 +164,7 @@ if (any(is.na(names(clusters)))) {
 sem_sub <- sem_sim[unlist(row_order(heatmap)), unlist(column_order(heatmap))]
 genes_sub <- genes[genes$ENTREZID %in% unlist(clusters), ]
 sem_sub <- sem_sim[rownames(sem_sim) %in% genes_sub$SYMBOL, colnames(sem_sim) %in% genes_sub$SYMBOL]
-not_clustered <- genes$SYMBOL[genes$SYMBOL %notin% rownames(sem_sub)]
+not_clustered <- genes_orig$V1[genes_orig$V1 %notin% rownames(sem_sub)]
 print(
   paste0(
     "Genes not clustered (", length(not_clustered), "): ", paste(not_clustered, collapse = ", ")
@@ -203,10 +203,10 @@ dotplot(compare_clusters)
 ```{r}
 run <- "NLF"
 
-genes <- read.table(
+genes_orig <- read.table(
   file.path(assets_dir, "gene-sets", paste0("MG-gene-symbols-", run, ".txt")), FALSE, "\t"
 )
-genes <- bitr(genes$V1, "SYMBOL", "ENTREZID", "org.Mm.eg.db")
+genes <- bitr(genes_orig$V1, "SYMBOL", "ENTREZID", "org.Mm.eg.db")
 
 rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_go_data.rds"))
 if (file.exists(rds)) {
@@ -243,10 +243,9 @@ if (file.exists(rds)) {
   )
   saveRDS(nbclust, rds)
 }
-split <- maxSE(nbclust$Tab[ , "gap"], nbclust$Tab[ , "SE.sim"], "globalSEmax", 2)
-fviz_gap_stat(nbclust, maxSE = list(method = "globalSEmax", SE.factor = 2))
+split <- maxSE(nbclust$Tab[ , "gap"], nbclust$Tab[ , "SE.sim"], "firstmax")
+fviz_gap_stat(nbclust, maxSE = list(method = "firstmax"))
 
-split <- 9
 set.seed(1)
 heatmap <- Heatmap(
   sem_sim, color, column_names_gp = gpar(fontsize = 10),
@@ -271,7 +270,7 @@ if (any(is.na(names(clusters)))) {
 sem_sub <- sem_sim[unlist(row_order(heatmap)), unlist(column_order(heatmap))]
 genes_sub <- genes[genes$ENTREZID %in% unlist(clusters), ]
 sem_sub <- sem_sim[rownames(sem_sim) %in% genes_sub$SYMBOL, colnames(sem_sim) %in% genes_sub$SYMBOL]
-not_clustered <- genes$SYMBOL[genes$SYMBOL %notin% rownames(sem_sub)]
+not_clustered <- genes_orig$V1[genes_orig$V1 %notin% rownames(sem_sub)]
 print(
   paste0(
     "Genes not clustered (", length(not_clustered), "): ", paste(not_clustered, collapse = ", ")
