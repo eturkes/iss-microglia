@@ -72,6 +72,11 @@ packages <- c(
 )
 invisible(suppressPackageStartupMessages(lapply(packages, library, character.only = TRUE)))
 
+nbclust_fun <- function(x, k) {
+  list(cluster = cutree(hclust(get_dist((x), "spearman"), "ward.D2"), k))
+}
+`%notin%` <- Negate(`%in%`)
+
 analysis_no <- "01"
 color <- colorRampPalette(rev(brewer.pal(9, "RdBu")))(100)
 # --------------------------------------------
@@ -105,7 +110,7 @@ rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_go_data.rds"))
 if (file.exists(rds)) {
   go_data <- readRDS(rds)
 } else {
-  go_data <- godata("org.Mm.eg.db", "SYMBOL", "BP", FALSE)
+  go_data <- godata("org.Mm.eg.db", "SYMBOL", "BP", TRUE)
   saveRDS(go_data, rds)
 }
 
@@ -113,27 +118,58 @@ rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_sem_sim.rds"))
 if (file.exists(rds)) {
   sem_sim <- readRDS(rds)
 } else {
-  sem_sim <- mgeneSim(genes$SYMBOL, go_data, drop = NULL, verbose = FALSE)
+  sem_sim <- mgeneSim(genes$SYMBOL, go_data, "Jiang", NULL, verbose = FALSE)
   saveRDS(sem_sim, rds)
 }
+clustering <- hclust(get_dist(sem_sim, "spearman"), "ward.D2")
 
-nbclust <- fviz_nbclust(
-  sem_sim, kmeans, k.max = nrow(sem_sim) / 2, print.summary = FALSE, verbose = FALSE
+fviz_nbclust(
+  sem_sim, nbclust_fun, k.max = nrow(sem_sim) / 2, print.summary = FALSE, verbose = FALSE
 )
-nbclust
+fviz_nbclust(
+  sem_sim, nbclust_fun, "wss", k.max = nrow(sem_sim) / 2, print.summary = FALSE, verbose = FALSE
+)
 
-split <- which.max(nbclust$data$y)
+rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_nbclust.rds"))
+if (file.exists(rds)) {
+  nbclust <- readRDS(rds)
+} else {
+  nbclust <- clusGap(
+    sem_sim, nbclust_fun, nrow(sem_sim) / 2, d.power = 2, verbose = FALSE
+  )
+  saveRDS(nbclust, rds)
+}
+split <- maxSE(nbclust$Tab[ , "gap"], nbclust$Tab[ , "SE.sim"], "globalSEmax")
+fviz_gap_stat(nbclust, maxSE = list(method = "globalSEmax"))
+
 set.seed(1)
 heatmap <- Heatmap(
-  sem_sim, color, row_split = split, column_split = split, show_heatmap_legend = FALSE
+  sem_sim, color, row_split = split, column_split = split,
+  show_heatmap_legend = FALSE, cluster_rows = clustering, cluster_columns = clustering
 )
 draw(heatmap)
 
-clusters <- vector("list", length(column_order(heatmap)))
-for (i in seq_along(column_order(heatmap))) {
-  clusters[[i]] <- genes$ENTREZID[column_order(heatmap)[[i]]]
-  names(clusters)[i] <- paste0("cluster", i)
+clusters <- row_order(heatmap)
+genes_sub <- genes[genes$SYMBOL %in% rownames(sem_sim), ]
+for (i in seq_along(clusters)) {
+  if (length(clusters[[i]]) > 1) {
+    clusters[[i]] <- genes_sub$ENTREZID[row_order(heatmap)[[i]]]
+    names(clusters)[i] <- paste0("c", i)
+  }
 }
+if (any(is.na(names(clusters)))) {
+  clusters <- clusters[-which(is.na(names(clusters)))]
+}
+
+sem_sub <- sem_sim[unlist(row_order(heatmap)), unlist(column_order(heatmap))]
+genes_sub <- genes[genes$ENTREZID %in% unlist(clusters), ]
+sem_sub <- sem_sim[rownames(sem_sim) %in% genes_sub$SYMBOL, colnames(sem_sim) %in% genes_sub$SYMBOL]
+not_clustered <- genes$SYMBOL[genes$SYMBOL %notin% rownames(sem_sub)]
+print(
+  paste0(
+    "Genes not clustered (", length(not_clustered), "): ", paste(not_clustered, collapse = ", ")
+  )
+)
 
 rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_compare_clusters.rds"))
 if (file.exists(rds)) {
@@ -160,7 +196,7 @@ rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_go_data.rds"))
 if (file.exists(rds)) {
   go_data <- readRDS(rds)
 } else {
-  go_data <- godata("org.Mm.eg.db", "SYMBOL", "BP", FALSE)
+  go_data <- godata("org.Mm.eg.db", "SYMBOL", "BP", TRUE)
   saveRDS(go_data, rds)
 }
 
@@ -168,32 +204,66 @@ rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_sem_sim.rds"))
 if (file.exists(rds)) {
   sem_sim <- readRDS(rds)
 } else {
-  sem_sim <- mgeneSim(genes$SYMBOL, go_data, drop = NULL, verbose = FALSE)
+  sem_sim <- mgeneSim(genes$SYMBOL, go_data, "Jiang", NULL, verbose = FALSE)
   saveRDS(sem_sim, rds)
 }
-
-nbclust <- fviz_nbclust(
-  sem_sim, kmeans, k.max = nrow(sem_sim) / 4, print.summary = FALSE, verbose = FALSE
-)
-nbclust
+clustering <- hclust(get_dist(sem_sim, "spearman"), "ward.D2")
 ```
 
-```{r, fig.width = 15, fig.height = 15}
-split <- which.max(nbclust$data$y)
+```{r, fig.width = 25, fig.height = 25}
+fviz_nbclust(
+  sem_sim, nbclust_fun, k.max = nrow(sem_sim) / 2, print.summary = FALSE, verbose = FALSE
+)
+fviz_nbclust(
+  sem_sim, nbclust_fun, "wss", k.max = nrow(sem_sim) / 2, print.summary = FALSE, verbose = FALSE
+)
+
+rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_nbclust.rds"))
+if (file.exists(rds)) {
+  nbclust <- readRDS(rds)
+} else {
+  nbclust <- clusGap(
+    sem_sim, nbclust_fun, nrow(sem_sim) / 2, d.power = 2, verbose = FALSE
+  )
+  saveRDS(nbclust, rds)
+}
+split <- maxSE(nbclust$Tab[ , "gap"], nbclust$Tab[ , "SE.sim"], "globalSEmax", 2)
+fviz_gap_stat(nbclust, maxSE = list(method = "globalSEmax", SE.factor = 2))
+
+split <- 9
 set.seed(1)
 heatmap <- Heatmap(
-  sem_sim, color, row_split = split,
-  column_split = split, show_heatmap_legend = FALSE, row_names_gp = gpar(fontsize = 8),
-  column_names_gp = gpar(fontsize = 8)
+  sem_sim, color, column_names_gp = gpar(fontsize = 10),
+  row_names_gp = gpar(fontsize = 10), cluster_rows = clustering, cluster_columns = clustering,
+  row_split = split, column_split = split, show_heatmap_legend = FALSE,
+  row_title_gp = gpar(fontsize = 12), column_title_gp = gpar(fontsize = 12)
 )
 draw(heatmap)
 
-clusters <- vector("list", length(column_order(heatmap)))
-for (i in seq_along(column_order(heatmap))) {
-  clusters[[i]] <- genes$ENTREZID[column_order(heatmap)[[i]]]
-  names(clusters)[i] <- paste0("cluster", i)
+clusters <- row_order(heatmap)
+genes_sub <- genes[genes$SYMBOL %in% rownames(sem_sim), ]
+for (i in seq_along(clusters)) {
+  if (length(clusters[[i]]) > 1) {
+    clusters[[i]] <- genes_sub$ENTREZID[row_order(heatmap)[[i]]]
+    names(clusters)[i] <- paste0("c", i)
+  }
+}
+if (any(is.na(names(clusters)))) {
+  clusters <- clusters[-which(is.na(names(clusters)))]
 }
 
+sem_sub <- sem_sim[unlist(row_order(heatmap)), unlist(column_order(heatmap))]
+genes_sub <- genes[genes$ENTREZID %in% unlist(clusters), ]
+sem_sub <- sem_sim[rownames(sem_sim) %in% genes_sub$SYMBOL, colnames(sem_sim) %in% genes_sub$SYMBOL]
+not_clustered <- genes$SYMBOL[genes$SYMBOL %notin% rownames(sem_sub)]
+print(
+  paste0(
+    "Genes not clustered (", length(not_clustered), "): ", paste(not_clustered, collapse = ", ")
+  )
+)
+```
+
+```{r, fig.width = 15, fig.height = 12}
 rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_compare_clusters.rds"))
 if (file.exists(rds)) {
   compare_clusters <- readRDS(rds)
