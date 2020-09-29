@@ -171,6 +171,22 @@ print(
   )
 )
 
+clusters_symbols <- vector("list", length(clusters) + 1)
+genes_sub <- genes[genes$SYMBOL %in% rownames(sem_sim), ]
+j <- 1
+for (i in seq_along(row_order(heatmap))) {
+  if (length(row_order(heatmap)[[i]]) > 1) {
+    clusters_symbols[[j]] <- genes_sub$SYMBOL[row_order(heatmap)[[i]]]
+    names(clusters_symbols)[j] <- paste0("c", i)
+    j <- j + 1
+    if (j == length(clusters_symbols)) {
+      clusters_symbols[[j]] <- not_clustered
+      names(clusters_symbols)[j] <- "cNA"
+    }
+  }
+}
+clusters_symbols
+
 rds <- file.path(cache_dir, paste0(analysis_no, "_", run, "_compare_clusters.rds"))
 if (file.exists(rds)) {
   compare_clusters <- readRDS(rds)
@@ -261,6 +277,22 @@ print(
     "Genes not clustered (", length(not_clustered), "): ", paste(not_clustered, collapse = ", ")
   )
 )
+
+clusters_symbols <- vector("list", length(clusters) + 1)
+genes_sub <- genes[genes$SYMBOL %in% rownames(sem_sim), ]
+j <- 1
+for (i in seq_along(row_order(heatmap))) {
+  if (length(row_order(heatmap)[[i]]) > 1) {
+    clusters_symbols[[j]] <- genes_sub$SYMBOL[row_order(heatmap)[[i]]]
+    names(clusters_symbols)[j] <- paste0("c", i)
+    j <- j + 1
+    if (j == length(clusters_symbols)) {
+      clusters_symbols[[j]] <- not_clustered
+      names(clusters_symbols)[j] <- "cNA"
+    }
+  }
+}
+clusters_symbols
 ```
 
 ```{r, fig.width = 15, fig.height = 12}
