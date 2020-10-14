@@ -18,9 +18,11 @@
 
 %% Prep Data
 DataName = 'NLF-133genes';
-Sample = 'NLF';
+Sample = 'NLF-oldRound4-noChan1';
 
-load(fullfile('results', 'data', DataName, Sample, 'o.mat'));
+load(fullfile('results', 'data', DataName, 'same-pipeline', Sample, 'o.mat'));
+o.BigDapiFile = fullfile('results', 'data', DataName, 'same-pipeline', Sample, ...
+    'background_image.tif');
 Roi = round([1, max(o.SpotGlobalYX(:,2)), 1, max(o.SpotGlobalYX(:,1))]);
 
 % Get genes from codebook.
@@ -32,15 +34,53 @@ fclose(fp);
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Plot All Spots
-o.plot(o.BigDapiFile, Roi, 'DotProduct');
+o.plot(o.BigDapiFile, Roi, 'Pixel');
+caxis([0,750]);
 set(gca, 'YDir', 'reverse');
 set(gca, 'XDir', 'reverse');
-iss_change_plot_MG133(o, 'DotProduct');
-saveas(gcf, fullfile('results', 'figures', DataName, Sample, 'all'), 'svg');
+iss_change_plot_MG133(o, 'Pixel');
+saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, 'allgenes'), 'svg');
 
 %% Individual Genes
 for i = 1:length(GeneNames)
-    iss_change_plot_individual_MG133(o, 'DotProduct', GeneNames(i));
-    saveas(gcf, fullfile('results', 'figures', DataName, Sample, 'individual', GeneNames{i}), ...
-        'svg');
+    iss_change_plot_individual_MG133(o, 'Pixel', GeneNames(i));
+    saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, 'individual', ...
+        GeneNames{i}), 'svg');
+end
+
+%% Contour Plots
+for i = 1:length(GeneNames)
+    iss_change_plot_contour_individual_MG133(o, 'Pixel', GeneNames(i));
+    saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, 'contour', ...
+        GeneNames{i}), 'svg');
+end
+
+%% Plots By Gene Group
+for i = 1:7
+    % Get genes from each gene group.
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    fp = fopen(fullfile('results', 'R', strcat('group', num2str(i), '.txt')), 'r');
+    tmp = textscan(fp, '%s %s', inf);
+    genes = tmp{1};
+    fclose(fp);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    iss_change_plot_group_MG133(o, 'Pixel', genes);
+    saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, ...
+        'by-gene-group', 'contour', strcat('group', num2str(i))), 'svg');
+end
+
+%% Contour Plots By Gene Group
+for i = 1:7
+    % Get genes from each gene group.
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    fp = fopen(fullfile('results', 'R', strcat('group', num2str(i), '.txt')), 'r');
+    tmp = textscan(fp, '%s %s', inf);
+    genes = tmp{1};
+    fclose(fp);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    iss_change_plot_contour_MG133(o, 'Pixel', genes);
+    saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, ...
+        'by-gene-group', 'contour', strcat('group', num2str(i))), 'svg');
 end

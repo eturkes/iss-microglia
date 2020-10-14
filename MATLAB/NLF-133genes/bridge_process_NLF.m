@@ -43,7 +43,7 @@ o.FileBase{1} = 'r0002';
 o.FileBase{2} = 'r1002';
 o.FileBase{3} = 'r2002';
 o.FileBase{4} = 'r3002';
-o.FileBase{5} = 'r4002_NEW';
+o.FileBase{5} = 'r4002_old';
 o.FileBase{6} = 'r5002';
 o.FileBase{7} = 'r6002';
 o.FileBase{8} = 'Anchor002';    %Make sure the last round is the anchor
@@ -142,7 +142,9 @@ o.FindSpotsWidenSearch = [50,50];
 
 o.PcDist = 3;
 
-o.PcImageMatchesThresh = 24;
+% o.PcImageMatchesThresh = 24;
+% o.PcImageMatchesThresh = 47;
+o.PcImageMatchesThresh = 30;
 
 %run code
 if isprop(o,'FindSpotsMethod') && strcmpi(o.FindSpotsMethod, 'Fft')
@@ -156,20 +158,19 @@ save(fullfile(o.OutputDirectory, 'oFind_spots'), 'o', '-v7.3');
 %run code
 o.CallSpotsCodeNorm = 'WholeCode';      %Other alternative is 'Round'
 o = o.call_spots;
-% [o,LookupTable] = o.call_spots_prob;
+[o,LookupTable] = o.call_spots_prob;
 save(fullfile(o.OutputDirectory, 'oCall_spots'), 'o', '-v7.3');
 
 %Pixel based
-% o = o.call_spots_pixel(LookupTable);
-% save(fullfile(o.OutputDirectory, 'oCall_spots_pixel'), 'o', '-v7.3');
+o = o.call_spots_pixel(LookupTable);
+save(fullfile(o.OutputDirectory, 'oCall_spots_pixel'), 'o', '-v7.3');
 %% plot results
 
 % o.CombiQualThresh = 0.7;
 Roi = round([1, max(o.SpotGlobalYX(:,2)), ...
 1, max(o.SpotGlobalYX(:,1))]);
 % o.plot(o.BigAnchorFile,Roi,'Prob');
-%o.plot(o.BigAnchorFile,Roi,'Pixel');
-o.plot(o.BigAnchorFile, Roi, 'DotProduct');
+o.plot(o.BigAnchorFile,Roi,'Pixel');
 
 %iss_view_codes(o,234321,1);
 %o.pIntensityThresh = 100;
