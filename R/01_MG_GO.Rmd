@@ -291,6 +291,14 @@ for (i in seq_along(row_order(heatmap))) {
     }
   }
 }
+
+for (i in 1:length(clusters_symbols)) {
+  write.table(
+    clusters_symbols[i], file.path(results_dir, paste0("group", i, ".txt")), quote = FALSE,
+    row.names = FALSE, col.names = FALSE
+  )
+}
+
 clusters_symbols
 ```
 
