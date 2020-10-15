@@ -19,6 +19,7 @@
 %% Prep Data
 DataName = 'NLF-133genes';
 Sample = 'NLF-oldRound4-noChan1';
+SampleShort = 'NLF';
 
 load(fullfile('results', 'data', DataName, 'same-pipeline', Sample, 'o.mat'));
 o.BigDapiFile = fullfile('results', 'data', DataName, 'same-pipeline', Sample, ...
@@ -39,20 +40,21 @@ caxis([0,750]);
 set(gca, 'YDir', 'reverse');
 set(gca, 'XDir', 'reverse');
 iss_change_plot_MG133(o, 'Pixel');
-saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, 'allgenes'), 'svg');
+saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, ...
+    strcat(SampleShort, '-allgenes')), 'svg');
 
 %% Individual Genes
 for i = 1:length(GeneNames)
     iss_change_plot_individual_MG133(o, 'Pixel', GeneNames(i));
     saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, 'individual', ...
-        GeneNames{i}), 'svg');
+        strcat(SampleShort, '-', GeneNames{i})), 'svg');
 end
 
 %% Contour Plots
 for i = 1:length(GeneNames)
     iss_change_plot_contour_individual_MG133(o, 'Pixel', GeneNames(i));
     saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, 'contour', ...
-        GeneNames{i}), 'svg');
+        strcat(SampleShort, '-', GeneNames{i})), 'svg');
 end
 
 %% Plots By Gene Group
@@ -67,7 +69,7 @@ for i = 1:7
 
     iss_change_plot_group_MG133(o, 'Pixel', genes);
     saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, ...
-        'by-gene-group', 'contour', strcat('group', num2str(i))), 'svg');
+        'by-gene-group', strcat(SampleShort, '-', 'group', num2str(i))), 'svg');
 end
 
 %% Contour Plots By Gene Group
@@ -82,5 +84,5 @@ for i = 1:7
 
     iss_change_plot_contour_MG133(o, 'Pixel', genes);
     saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, ...
-        'by-gene-group', 'contour', strcat('group', num2str(i))), 'svg');
+        'by-gene-group', 'contour', strcat(SampleShort, '-', 'group', num2str(i))), 'svg');
 end
