@@ -17,12 +17,13 @@
 %    Emir Turkes can be contacted at emir.turkes@eturkes.com
 
 %% Prep Data
-DataName = 'NLF-133genes';
+DataName = 'NLF-150genes';
 Sample = 'CTRL-oldRound4-noChan1';
 SampleShort = 'CTRL';
+Pipeline = 'same-pipeline';
 
-load(fullfile('results', 'data', DataName, 'same-pipeline', Sample, 'o.mat'));
-o.BigDapiFile = fullfile('results', 'data', DataName, 'same-pipeline', Sample, ...
+load(fullfile('results', 'data', DataName, Pipeline, Sample, 'o.mat'));
+o.BigDapiFile = fullfile('results', 'data', DataName, Pipeline, Sample, ...
     'background_image.tif');
 Roi = round([1, max(o.SpotGlobalYX(:,2)), 1, max(o.SpotGlobalYX(:,1))]);
 
@@ -37,28 +38,31 @@ fclose(fp);
 %% Plot All Spots
 o.plot(o.BigDapiFile, Roi, 'Pixel');
 caxis([0,750]);
-set(gca, 'YDir', 'reverse');
-set(gca, 'XDir', 'reverse');
-iss_change_plot_MG133(o, 'Pixel');
-saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, ...
-    strcat(SampleShort, '-allgenes')), 'svg');
+set(gca, 'XTick', [], 'YTick', [], 'XDir', 'reverse', 'YDir', 'reverse')
+iss_change_plot_MG150(o, 'Pixel');
+% saveas(gcf, fullfile('results', 'figures', DataName, Pipeline, Sample, ...
+%     strcat(SampleShort, '-allgenes')), 'svg');
 
 %% Individual Genes
 for i = 1:length(GeneNames)
-    iss_change_plot_individual_MG133(o, 'Pixel', GeneNames(i));
-    saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, 'individual', ...
-        strcat(SampleShort, '-', GeneNames{i})), 'svg');
+    if i ~= 106
+        iss_change_plot_individual_MG150(o, 'Pixel', GeneNames(i));
+        saveas(gcf, fullfile('results', 'figures', DataName, Pipeline, Sample, 'individual', ...
+            strcat(SampleShort, '-', GeneNames{i})), 'svg');
+    end
 end
 
 %% Contour Plots
 for i = 1:length(GeneNames)
-    iss_change_plot_contour_individual_MG133(o, 'Pixel', GeneNames(i));
-    saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, 'contour', ...
-        strcat(SampleShort, '-', GeneNames{i})), 'svg');
+    if i ~= 106
+        iss_change_plot_contour_individual_MG150(o, 'Pixel', GeneNames(i));
+        saveas(gcf, fullfile('results', 'figures', DataName, Pipeline, Sample, 'contour', ...
+            strcat(SampleShort, '-', GeneNames{i})), 'svg');
+    end
 end
 
 %% Plots By Gene Group
-for i = 1:7
+for i = 1:6
     % Get genes from each gene group.
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     fp = fopen(fullfile('results', 'R', strcat('group', num2str(i), '.txt')), 'r');
@@ -67,13 +71,13 @@ for i = 1:7
     fclose(fp);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    iss_change_plot_group_MG133(o, 'Pixel', genes);
-    saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, ...
+    iss_change_plot_group_MG150(o, 'Pixel', genes);
+    saveas(gcf, fullfile('results', 'figures', DataName, Pipeline, Sample, ...
         'by-gene-group', strcat(SampleShort, '-', 'group', num2str(i))), 'svg');
 end
 
 %% Contour Plots By Gene Group
-for i = 1:7
+for i = 1:6
     % Get genes from each gene group.
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     fp = fopen(fullfile('results', 'R', strcat('group', num2str(i), '.txt')), 'r');
@@ -82,7 +86,7 @@ for i = 1:7
     fclose(fp);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    iss_change_plot_contour_MG133(o, 'Pixel', genes);
-    saveas(gcf, fullfile('results', 'figures', DataName, 'same-pipeline', Sample, ...
+    iss_change_plot_contour_MG150(o, 'Pixel', genes);
+    saveas(gcf, fullfile('results', 'figures', DataName, Pipeline, Sample, ...
         'by-gene-group', 'contour', strcat(SampleShort, '-', 'group', num2str(i))), 'svg');
 end
