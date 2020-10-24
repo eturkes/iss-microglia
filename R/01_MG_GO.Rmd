@@ -243,7 +243,8 @@ if (file.exists(rds)) {
   )
   saveRDS(nbclust, rds)
 }
-split <- maxSE(nbclust$Tab[ , "gap"], nbclust$Tab[ , "SE.sim"], "firstmax")
+# split <- maxSE(nbclust$Tab[ , "gap"], nbclust$Tab[ , "SE.sim"], "firstmax")
+split <- 5
 fviz_gap_stat(nbclust, maxSE = list(method = "firstmax"))
 
 set.seed(1)
@@ -266,6 +267,12 @@ for (i in seq_along(clusters)) {
 if (any(is.na(names(clusters)))) {
   clusters <- clusters[-which(is.na(names(clusters)))]
 }
+
+names(clusters)[1] <- "red"
+names(clusters)[2] <- "yellow"
+names(clusters)[3] <- "green"
+names(clusters)[4] <- "brown"
+names(clusters)[5] <- "blue"
 
 sem_sub <- sem_sim[unlist(row_order(heatmap)), unlist(column_order(heatmap))]
 genes_sub <- genes[genes$ENTREZID %in% unlist(clusters), ]
