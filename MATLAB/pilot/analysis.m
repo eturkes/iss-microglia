@@ -19,6 +19,7 @@
 %% Prep Data
 load(fullfile('results', 'data', 'pilot', 'o.mat'));
 Roi = round([1, max(o.SpotGlobalYX(:,2)), 1, max(o.SpotGlobalYX(:,1))]);
+o.BigDapiFile = fullfile('results', 'data', 'pilot', 'background_image.tif');
 
 % Make codebook subsets.
 %%%%%%%%%%%%%%%%%%%%%%%%
