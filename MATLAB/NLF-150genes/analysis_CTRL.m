@@ -27,6 +27,9 @@ o.BigDapiFile = fullfile('results', 'data', DataName, Pipeline, Sample, ...
     'background_image.tif');
 Roi = round([1, max(o.SpotGlobalYX(:,2)), 1, max(o.SpotGlobalYX(:,1))]);
 
+o.pIntensityThresh = max(o.pSpotIntensity) + 1;
+o.pScoreThresh = 7.5;
+
 % Get genes from codebook.
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 fp = fopen(fullfile('assets', 'codebooks', DataName, 'codebook-iss-cleaned.tsv'), 'r');
@@ -54,7 +57,7 @@ end
 
 %% Contour Plots
 for i = 1:length(GeneNames)
-    if i ~= 106
+    if i ~= 106 && i ~= 62 && i ~= 118 && i ~= 139
         iss_change_plot_contour_individual_MG150(o, 'Pixel', GeneNames(i));
         saveas(gcf, fullfile('results', 'figures', DataName, Pipeline, Sample, 'contour', ...
             strcat(SampleShort, '-', GeneNames{i})), 'svg');
@@ -65,7 +68,7 @@ end
 for i = 1:6
     % Get genes from each gene group.
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    fp = fopen(fullfile('results', 'R', strcat('group', num2str(i), '.txt')), 'r');
+    fp = fopen(fullfile('results', 'R', 'new-clusters', strcat('group', num2str(i), '.txt')), 'r');
     tmp = textscan(fp, '%s %s', inf);
     genes = tmp{1};
     fclose(fp);
@@ -80,7 +83,7 @@ end
 for i = 1:6
     % Get genes from each gene group.
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    fp = fopen(fullfile('results', 'R', strcat('group', num2str(i), '.txt')), 'r');
+    fp = fopen(fullfile('results', 'R', 'new-clusters', strcat('group', num2str(i), '.txt')), 'r');
     tmp = textscan(fp, '%s %s', inf);
     genes = tmp{1};
     fclose(fp);
