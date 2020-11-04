@@ -93,3 +93,9 @@ for i = 1:6
     saveas(gcf, fullfile('results', 'figures', DataName, Pipeline, Sample, ...
         'by-gene-group', 'contour', strcat(SampleShort, '-', 'group', num2str(i))), 'svg');
 end
+
+%% Export Spot Codes
+Thresh = o.quality_threshold('Pixel');
+SpotCode = o.pxSpotCodeNo(Thresh,:);
+writematrix(SpotCode, fullfile('assets', 'codebooks', DataName, ...
+    strcat(SampleShort, '-', 'SpotCode.txt')));
