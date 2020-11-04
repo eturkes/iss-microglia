@@ -30,14 +30,6 @@ Roi = round([1, max(o.SpotGlobalYX(:,2)), 1, max(o.SpotGlobalYX(:,1))]);
 o.pIntensityThresh = max(o.pSpotIntensity) + 1;
 o.pScoreThresh = 7.5;
 
-% Get genes from codebook.
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-fp = fopen(fullfile('assets', 'codebooks', DataName, 'codebook-iss-cleaned.tsv'), 'r');
-tmp = textscan(fp, '%s %s', inf);
-GeneNames = tmp{1};
-fclose(fp);
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 %% Plot All Spots
 o.plot(o.BigDapiFile, Roi, 'Pixel');
 caxis([0,750]);
@@ -47,20 +39,20 @@ iss_change_plot_MG150(o, 'Pixel');
 %     strcat(SampleShort, '-allgenes')), 'svg');
 
 %% Individual Genes
-for i = 1:length(GeneNames)
+for i = 1:length(o.GeneNames)
     if i ~= 106
-        iss_change_plot_individual_MG150(o, 'Pixel', GeneNames(i));
+        iss_change_plot_individual_MG150(o, 'Pixel', o.GeneNames(i));
         saveas(gcf, fullfile('results', 'figures', DataName, Pipeline, Sample, 'individual', ...
-            strcat(SampleShort, '-', GeneNames{i})), 'svg');
+            strcat(SampleShort, '-', o.GeneNames{i})), 'svg');
     end
 end
 
 %% Contour Plots
-for i = 1:length(GeneNames)
+for i = 1:length(o.GeneNames)
     if i ~= 106 && i ~= 62 && i ~= 139
-        iss_change_plot_contour_individual_MG150(o, 'Pixel', GeneNames(i));
+        iss_change_plot_contour_individual_MG150(o, 'Pixel', o.GeneNames(i));
         saveas(gcf, fullfile('results', 'figures', DataName, Pipeline, Sample, 'contour', ...
-            strcat(SampleShort, '-', GeneNames{i})), 'svg');
+            strcat(SampleShort, '-', o.GeneNames{i})), 'svg');
     end
 end
 
