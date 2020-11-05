@@ -129,8 +129,8 @@ spot_names_table <- spot_names_table[!duplicated(spot_names_table), ]
 colnames(spot_names_table) <- c("gene_names", "freq", "spot_code", "cluster")
 spot_names_table$gene_names <- factor(spot_names_table$gene_names, rev(unlist(cluster_list)))
 
-ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster)) +
-  geom_bar(stat = "identity") +
+ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster, color = cluster)) +
+  geom_bar(stat = "identity", alpha = 0.8) +
   coord_flip() +
   labs(
     x = "Genes", y = "Number of Spots (Log Scale)",
@@ -146,6 +146,21 @@ ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster)) +
     legend.text = element_text(size = 20)
   ) +
   scale_fill_manual(
+    name = "Clusters",
+    labels = c(
+      "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
+      "ATPase activity\npH regulation",
+      "Lysosome activity\nProtein processing\nPeptidase activity",
+      "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
+      "Phagosome formation\nActin cytoskeletal processes",
+      "Uncatagorized"
+    ),
+    values = c(
+      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
+    )
+  ) +
+  scale_color_manual(
     name = "Clusters",
     labels = c(
       "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
@@ -261,8 +276,8 @@ spot_names_table <- spot_names_table[!duplicated(spot_names_table), ]
 colnames(spot_names_table) <- c("gene_names", "freq", "spot_code", "cluster")
 spot_names_table$gene_names <- factor(spot_names_table$gene_names, rev(unlist(cluster_list)))
 
-ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster)) +
-  geom_bar(stat = "identity") +
+ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster, color = cluster)) +
+  geom_bar(stat = "identity", alpha = 0.8) +
   coord_flip() +
   labs(
     x = "Genes", y = "Number of Spots (Log Scale)",
@@ -278,6 +293,21 @@ ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster)) +
     legend.text = element_text(size = 20)
   ) +
   scale_fill_manual(
+    name = "Clusters",
+    labels = c(
+      "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
+      "ATPase activity\npH regulation",
+      "Lysosome activity\nProtein processing\nPeptidase activity",
+      "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
+      "Phagosome formation\nActin cytoskeletal processes",
+      "Uncatagorized"
+    ),
+    values = c(
+      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
+    )
+  ) +
+  scale_color_manual(
     name = "Clusters",
     labels = c(
       "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
