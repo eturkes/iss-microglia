@@ -259,7 +259,7 @@ ggplot(spot_names_mean, aes(x = "", y = freq, fill = cluster)) +
   )
 ```
 
-# CTRL
+# NLF
 
 ```{r, fig.height = 20}
 sample <- "NLF"
