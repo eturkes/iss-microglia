@@ -213,6 +213,37 @@ ggplot(spot_names_table, aes(x = cluster, y = freq, fill = cluster, color = clus
   )
 ```
 
+```{r, fig.width = 8.5, fig.height = 6}
+ggplot(spot_names_mean, aes(x = "", y = freq, fill = cluster)) +
+  geom_bar(stat = "identity", width = 1, color = "black") +
+  coord_polar("y") +
+  theme_black() +
+  scale_fill_manual(
+    name = "Clusters",
+    labels = c(
+      "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
+      "ATPase activity\npH regulation",
+      "Lysosome activity\nProtein processing\nPeptidase activity",
+      "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
+      "Phagosome formation\nActin cytoskeletal processes",
+      "Uncatagorized"
+    ),
+    values = c(
+      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
+    )
+  ) +
+  labs(title = paste0(sample, " Cluster Proportions")) +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text.x = element_blank(), axis.text.y = element_blank(),
+    axis.title.x = element_blank(), axis.title.y = element_blank(),
+    axis.ticks.x = element_blank(), axis.ticks.y = element_blank(),
+    panel.border = element_blank(), legend.key.height = unit(1.5, "cm"),
+    plot.title = element_text(vjust = -5), plot.margin = unit(c(0,0,0,0), "cm")
+  )
+```
+
 # CTRL
 
 ```{r, fig.height = 20}
@@ -311,6 +342,37 @@ ggplot(spot_names_table, aes(x = cluster, y = freq, fill = cluster, color = clus
       hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
       hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
     )
+  )
+```
+
+```{r, fig.width = 8.5, fig.height = 6}
+ggplot(spot_names_mean, aes(x = "", y = freq, fill = cluster)) +
+  geom_bar(stat = "identity", width = 1, color = "black") +
+  coord_polar("y") +
+  theme_black() +
+  scale_fill_manual(
+    name = "Clusters",
+    labels = c(
+      "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
+      "ATPase activity\npH regulation",
+      "Lysosome activity\nProtein processing\nPeptidase activity",
+      "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
+      "Phagosome formation\nActin cytoskeletal processes",
+      "Uncatagorized"
+    ),
+    values = c(
+      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
+    )
+  ) +
+  labs(title = paste0(sample, " Cluster Proportions")) +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text.x = element_blank(), axis.text.y = element_blank(),
+    axis.title.x = element_blank(), axis.title.y = element_blank(),
+    axis.ticks.x = element_blank(), axis.ticks.y = element_blank(),
+    panel.border = element_blank(), legend.key.height = unit(1.5, "cm"),
+    plot.title = element_text(vjust = -5), plot.margin = unit(c(0,0,0,0), "cm")
   )
 ```
 
