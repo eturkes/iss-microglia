@@ -1,0 +1,221 @@
+---
+title:
+  '02 Cluster Proportions - `r unlist(strsplit(getwd(), "/"))[length(unlist(strsplit(getwd(), "/"))) - 1]`'
+author:
+  - name: "Emir Turkes [emir.turkes@eturkes.com]"
+  - name: "UK Dementia Research Institute at UCL"
+date: '`r strftime(Sys.time(), format = "%B %d, %Y")`'
+link-citations: true
+output:
+  html_document:
+    code_folding: hide
+    number_sections: true
+    theme: lumen
+    highlight: haddock
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(
+    inputFile,
+    encoding = encoding,
+    output_file = file.path("..", "results", "R", "02-cluster-proportion.html")
+  )})
+---
+
+<style type="text/css">
+body {font-size: 16px;}
+h1.title {font-size: 35px;}
+h1 {font-size: 24px;}
+h2 {font-size: 22px;}
+h3 {font-size: 20px;}
+.toc-content {padding-left: 0px; padding-right: 0px;}
+div.tocify {width: 100%;}
+.tocify-subheader .tocify-item {font-size: 0.95em; padding-left: 25px; text-indent: 0;}
+.tocify-subheader .tocify-subheader .tocify-item {
+  font-size: 0.95em; padding-left: 35px; text-indent: 0;
+}
+div.main-container {max-width: none; width: 100%;}
+</style>
+
+*This file is a part of [ISS Microglia](https://github.com/eturkes/iss-microglia).*
+
+The data here is derived from @`r unlist(strsplit(getwd(), "/"))[length(unlist(strsplit(getwd(), "/"))) - 1]` and will be referenced using the name ``r unlist(strsplit(getwd(), "/"))[length(unlist(strsplit(getwd(), "/"))) - 1]``.
+
+```{r}
+#    This file is part of iss-microglia.
+#    Copyright (C) 2020  Emir Turkes, Sebastiaan De Schepper, UK DRI at UCL
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#    Emir Turkes can be contacted at emir.turkes@eturkes.com
+
+# This section should be checked per document.
+# --------------------------------------------
+options(stringsAsFactors = FALSE)
+packages <- c("conflicted", "ggplot2")
+invisible(suppressPackageStartupMessages(lapply(packages, library, character.only = TRUE)))
+source("utils.R")
+
+analysis_no <- "02"
+# --------------------------------------------
+
+# Everything else in this chunk remains generally unchanged.
+# ----------------------------------------------------------
+data_name <- unlist(strsplit(getwd(), "/"))[length(unlist(strsplit(getwd(), "/")))] # Name of data.
+assets_dir <- file.path("..", "assets") # Backed up objects and data.
+cache_dir <- file.path("..", "cache", "R")
+results_dir <- file.path("..", "results", "R")
+
+if (!dir.exists(cache_dir)) {
+  dir.create(cache_dir, recursive = TRUE)
+}
+
+knitr::opts_chunk$set(fig.width = 10, fig.height = 7)
+# ----------------------------------------------------------
+```
+
+# Prep
+
+```{r}
+gene_names <- read.table(
+  file.path(assets_dir, "gene-sets", paste0("MG-gene-symbols-NLF", ".txt")), FALSE, "\t"
+)
+gene_names$V2 <- rownames(gene_names)
+
+cluster_list <- vector("list", 6)
+for (i in seq_along(cluster_list)) {
+  cluster_list[[i]] <- read.table(
+    file.path(results_dir, "new-clusters", paste0("group", i, ".txt")), FALSE, "\t"
+  )
+}
+
+gene_names$V3 <- gene_names$V2
+for (i in seq_along(gene_names$V3)) {
+  gene_names$V3[i] <- which(
+    sapply(seq_along(cluster_list), function(x) {gene_names$V1[i] %in% cluster_list[[x]]$V1})
+  )
+}
+```
+
+# CTRL
+
+```{r, fig.height = 20}
+sample <- "CTRL"
+
+spot_codes <- read.delim(
+  file.path(assets_dir, "codebooks", "NLF-150genes", paste0(sample, "-SpotCode.txt")), FALSE
+)
+spot_names <- merge(spot_codes, gene_names, by.x = "V1", by.y = "V2")
+colnames(spot_names) <- c("spot_code", "gene_names", "cluster")
+
+spot_names_table <- as.data.frame(table(spot_names$gene_names))
+spot_names_table <- merge(spot_names_table, spot_names, by.x = "Var1", by.y = "gene_names")
+spot_names_table <- spot_names_table[!duplicated(spot_names_table), ]
+colnames(spot_names_table) <- c("gene_names", "freq", "spot_code", "cluster")
+spot_names_table$gene_names <- factor(spot_names_table$gene_names, rev(unlist(cluster_list)))
+
+ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(
+    x = "Genes", y = "Number of Spots (Log Scale)",
+    title = paste0(sample, " Genes vs. Number of Spots")
+  ) +
+  theme_black() +
+  scale_y_log10(n.breaks = 6, expand = expansion(mult = c(0, 0)), limits = c(1, 20000)) +
+  theme(
+    panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(),
+    legend.key.height = unit(3, "cm"), axis.title.x = element_text(size = 25),
+    axis.title.y = element_text(size = 25), axis.text.x = element_text(size = 20),
+    plot.title = element_text(size = 30), legend.title = element_text(size = 25),
+    legend.text = element_text(size = 20)
+  ) +
+  scale_fill_manual(
+    name = "Clusters",
+    labels = c(
+      "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
+      "ATPase activity\npH regulation",
+      "Lysosome activity\nProtein processing\nPeptidase activity",
+      "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
+      "Phagosome formation\nActin cytoskeletal processes",
+      "Uncatagorized"
+    ),
+    values = c(
+      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
+    )
+  )
+```
+
+# CTRL
+
+```{r, fig.height = 20}
+sample <- "NLF"
+
+spot_codes <- read.delim(
+  file.path(assets_dir, "codebooks", "NLF-150genes", paste0(sample, "-SpotCode.txt")), FALSE
+)
+spot_names <- merge(spot_codes, gene_names, by.x = "V1", by.y = "V2")
+colnames(spot_names) <- c("spot_code", "gene_names", "cluster")
+
+spot_names_table <- as.data.frame(table(spot_names$gene_names))
+spot_names_table <- merge(spot_names_table, spot_names, by.x = "Var1", by.y = "gene_names")
+spot_names_table <- spot_names_table[!duplicated(spot_names_table), ]
+colnames(spot_names_table) <- c("gene_names", "freq", "spot_code", "cluster")
+spot_names_table$gene_names <- factor(spot_names_table$gene_names, rev(unlist(cluster_list)))
+
+ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(
+    x = "Genes", y = "Number of Spots (Log Scale)",
+    title = paste0(sample, " Genes vs. Number of Spots")
+  ) +
+  theme_black() +
+  scale_y_log10(n.breaks = 6, expand = expansion(mult = c(0, 0)), limits = c(1, 20000)) +
+  theme(
+    panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(),
+    legend.key.height = unit(3, "cm"), axis.title.x = element_text(size = 25),
+    axis.title.y = element_text(size = 25), axis.text.x = element_text(size = 20),
+    plot.title = element_text(size = 30), legend.title = element_text(size = 25),
+    legend.text = element_text(size = 20)
+  ) +
+  scale_fill_manual(
+    name = "Clusters",
+    labels = c(
+      "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
+      "ATPase activity\npH regulation",
+      "Lysosome activity\nProtein processing\nPeptidase activity",
+      "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
+      "Phagosome formation\nActin cytoskeletal processes",
+      "Uncatagorized"
+    ),
+    values = c(
+      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
+    )
+  )
+```
+
+# References
+
+This is the concluding section of the document.
+Here we output the `sessionInfo` and create a bibliography for works cited.
+
+```{r}
+sessionInfo()
+```
