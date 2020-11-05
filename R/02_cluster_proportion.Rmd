@@ -66,7 +66,7 @@ The data here is derived from @`r unlist(strsplit(getwd(), "/"))[length(unlist(s
 # This section should be checked per document.
 # --------------------------------------------
 options(stringsAsFactors = FALSE)
-packages <- c("conflicted", "ggplot2")
+packages <- c("conflicted", "ggplot2", "dplyr", "ggrepel")
 invisible(suppressPackageStartupMessages(lapply(packages, library, character.only = TRUE)))
 source("utils.R")
 
@@ -121,6 +121,7 @@ spot_codes <- read.delim(
 )
 spot_names <- merge(spot_codes, gene_names, by.x = "V1", by.y = "V2")
 colnames(spot_names) <- c("spot_code", "gene_names", "cluster")
+spot_names$cluster <- as.character(spot_names$cluster)
 
 spot_names_table <- as.data.frame(table(spot_names$gene_names))
 spot_names_table <- merge(spot_names_table, spot_names, by.x = "Var1", by.y = "gene_names")
@@ -145,6 +146,57 @@ ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster)) +
     legend.text = element_text(size = 20)
   ) +
   scale_fill_manual(
+    name = "Clusters",
+    labels = c(
+      "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
+      "ATPase activity\npH regulation",
+      "Lysosome activity\nProtein processing\nPeptidase activity",
+      "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
+      "Phagosome formation\nActin cytoskeletal processes",
+      "Uncatagorized"
+    ),
+    values = c(
+      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
+    )
+  )
+```
+
+```{r, fig.width = 12, fig.height = 7}
+spot_names_mean <- spot_names_table %>% group_by(cluster) %>% summarise(freq = mean(freq))
+
+ggplot(spot_names_table, aes(x = cluster, y = freq, fill = cluster, color = cluster)) +
+  geom_bar(data = spot_names_mean, stat = "identity", alpha = 0.3) +
+  geom_point() +
+  labs(
+    x = "Clusters", y = "Number of Spots (Log Scale)",
+    title = paste0(sample, " Cluster Means vs. Number of Spots")
+  ) +
+  theme_black() +
+  coord_flip() +
+  geom_text_repel(aes(label = gene_names), color = "white", size = 2.5, segment.color = "grey") +
+  scale_x_discrete(limits = rev(spot_names_mean$cluster)) +
+  scale_y_log10(n.breaks = 6, expand = expansion(mult = c(0, 0)), limits = c(1, 20000)) +
+  theme(
+    panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(),
+    legend.key.height = unit(2, "cm")
+  ) +
+  scale_fill_manual(
+    name = "Clusters",
+    labels = c(
+      "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
+      "ATPase activity\npH regulation",
+      "Lysosome activity\nProtein processing\nPeptidase activity",
+      "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
+      "Phagosome formation\nActin cytoskeletal processes",
+      "Uncatagorized"
+    ),
+    values = c(
+      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
+    )
+  ) +
+  scale_color_manual(
     name = "Clusters",
     labels = c(
       "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
@@ -195,6 +247,57 @@ ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster)) +
     legend.text = element_text(size = 20)
   ) +
   scale_fill_manual(
+    name = "Clusters",
+    labels = c(
+      "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
+      "ATPase activity\npH regulation",
+      "Lysosome activity\nProtein processing\nPeptidase activity",
+      "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
+      "Phagosome formation\nActin cytoskeletal processes",
+      "Uncatagorized"
+    ),
+    values = c(
+      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
+    )
+  )
+```
+
+```{r, fig.width = 12, fig.height = 7}
+spot_names_mean <- spot_names_table %>% group_by(cluster) %>% summarise(freq = mean(freq))
+
+ggplot(spot_names_table, aes(x = cluster, y = freq, fill = cluster, color = cluster)) +
+  geom_bar(data = spot_names_mean, stat = "identity", alpha = 0.3) +
+  geom_point() +
+  labs(
+    x = "Clusters", y = "Number of Spots (Log Scale)",
+    title = paste0(sample, " Clusters vs. Number of Spots")
+  ) +
+  theme_black() +
+  coord_flip() +
+  geom_text_repel(aes(label = gene_names), color = "white", size = 2.5, segment.color = "grey") +
+  scale_x_discrete(limits = rev(spot_names_mean$cluster)) +
+  scale_y_log10(n.breaks = 6, expand = expansion(mult = c(0, 0)), limits = c(1, 20000)) +
+  theme(
+    panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(),
+    legend.key.height = unit(2, "cm")
+  ) +
+  scale_fill_manual(
+    name = "Clusters",
+    labels = c(
+      "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
+      "ATPase activity\npH regulation",
+      "Lysosome activity\nProtein processing\nPeptidase activity",
+      "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
+      "Phagosome formation\nActin cytoskeletal processes",
+      "Uncatagorized"
+    ),
+    values = c(
+      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
+    )
+  ) +
+  scale_color_manual(
     name = "Clusters",
     labels = c(
       "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",

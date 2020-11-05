@@ -31,7 +31,7 @@ theme_black = function(base_size = 12, base_family = "") {
       axis.text.x = element_text(size = base_size*0.8, color = "white", lineheight = 0.9),  
       axis.text.y = element_text(size = base_size*0.8, color = "white", lineheight = 0.9),  
       axis.ticks = element_line(color = "white", size  =  0.2),  
-      axis.title.x = element_text(size = base_size, color = "white", face = "bold", margin = margin(0, 10, 0, 0)),  
+      axis.title.x = element_text(size = base_size, color = "white", face = "bold", margin = margin(0, 10, 0, 0), vjust = -1),  
       axis.title.y = element_text(size = base_size, color = "white", face = "bold", angle = 90, margin = margin(0, 10, 0, 0)),  
       axis.ticks.length = unit(0.3, "lines"),   
       # Specify legend options
