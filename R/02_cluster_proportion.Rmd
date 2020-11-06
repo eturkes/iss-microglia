@@ -332,7 +332,7 @@ ggplot(spot_names_table, aes(x = cluster, y = freq, fill = cluster, color = clus
   geom_point() +
   labs(
     x = "Clusters", y = "Number of Spots (Log Scale)",
-    title = paste0(sample, " Clusters vs. Number of Spots")
+    title = paste0(sample, " Cluster Means vs. Number of Spots")
   ) +
   theme_black() +
   coord_flip() +
