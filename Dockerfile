@@ -37,6 +37,7 @@ RUN apt-get update \
     -e "install.packages('DT')" \
     -e "install.packages('RColorBrewer')" \
     -e "install.packages('factoextra')" \
+    -e "install.packages('MESS')" \
     -e "install.packages('BiocManager')" \
     -e "BiocManager::install('org.Mm.eg.db')" \
     -e "BiocManager::install('ComplexHeatmap')" \
