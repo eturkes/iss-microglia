@@ -21,6 +21,9 @@ load(fullfile('results', 'data', 'pilot', 'o.mat'));
 Roi = round([1, max(o.SpotGlobalYX(:,2)), 1, max(o.SpotGlobalYX(:,1))]);
 o.BigDapiFile = fullfile('results', 'data', 'pilot', 'background_image.tif');
 
+o.pIntensityThresh = max(o.pSpotIntensity) + 1;
+o.pScoreThresh = 7.5;
+
 % Make codebook subsets.
 %%%%%%%%%%%%%%%%%%%%%%%%
 fp = fopen(fullfile('codebook_comb.txt'), 'r');
@@ -261,3 +264,8 @@ iss_change_plot_MG2_contour(o, 'Pixel', genes);
 saveas(gcf, fullfile('results', 'figures', 'pilot', 'contour', 'MG', 'clusters', 'non-specific', ...
     'c4'), 'svg');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Export Spot Codes
+Thresh = o.quality_threshold('Pixel');
+SpotCode = o.pxSpotCodeNo(Thresh,:);
+writematrix(SpotCode, fullfile('assets', 'codebooks', 'pilot', 'pilot-SpotCode.txt'));
