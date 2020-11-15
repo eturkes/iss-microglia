@@ -166,8 +166,8 @@ save(fullfile(o.OutputDirectory, 'oCall_spots_pixel'), 'o', '-v7.3');
 o.CombiQualThresh = 0.7;
 Roi = round([1, max(o.SpotGlobalYX(:,2)), ...
 1, max(o.SpotGlobalYX(:,1))]);
-o.plot(o.BigAnchorFile,Roi,'Prob');
-%o.plot(o.BigAnchorFile,Roi,'Pixel');
+% o.plot(o.BigAnchorFile,Roi,'Prob');
+o.plot(o.BigAnchorFile,Roi,'Pixel');
 
 %iss_view_codes(o,234321,1);
 %o.pIntensityThresh = 100;
