@@ -56,24 +56,24 @@ for i = 1:length(o.GeneNames)
     end
 end
 
-%% Plots By Gene Group
+%% Plots By Functional Cluster
 for i = 1:6
-    % Get genes from each gene group.
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Get genes from each functional cluster.
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     fp = fopen(fullfile('results', 'R', 'new-clusters', strcat('group', num2str(i), '.txt')), 'r');
     tmp = textscan(fp, '%s %s', inf);
     genes = tmp{1};
     fclose(fp);
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     iss_change_plot_group_MG150(o, 'Pixel', genes);
     saveas(gcf, fullfile('results', 'figures', DataName, Pipeline, Sample, ...
-        'by-gene-group', strcat(SampleShort, '-', 'group', num2str(i))), 'svg');
+        'functional-clusters', strcat(SampleShort, '-', 'group', num2str(i))), 'svg');
 end
 
-%% Contour Plots By Gene Group
+%% Contour Plots By Functional Cluster
 for i = 1:6
-    % Get genes from each gene group.
+    % Get genes from each functional cluster.
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     fp = fopen(fullfile('results', 'R', 'new-clusters', strcat('group', num2str(i), '.txt')), 'r');
     tmp = textscan(fp, '%s %s', inf);
@@ -83,7 +83,7 @@ for i = 1:6
 
     iss_change_plot_contour_MG150(o, 'Pixel', genes);
     saveas(gcf, fullfile('results', 'figures', DataName, Pipeline, Sample, ...
-        'by-gene-group', 'contour', strcat(SampleShort, '-', 'group', num2str(i))), 'svg');
+        'functional-clusters', 'contour', strcat(SampleShort, '-', 'group', num2str(i))), 'svg');
 end
 
 %% Export Spot Codes
@@ -146,34 +146,34 @@ for i = 1:length(o.GeneNames)
     end
 end
 
-%% Plots By Gene Group
+%% Plots By Functional Cluster
 for i = 1:6
-    % Get genes from each gene group.
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Get genes from each functional cluster.
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     fp = fopen(fullfile('results', 'R', 'new-clusters', strcat('group', num2str(i), '.txt')), 'r');
     tmp = textscan(fp, '%s %s', inf);
     genes = tmp{1};
     fclose(fp);
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     iss_change_plot_group_MG150(o, 'Pixel', genes, SpotSet);
     saveas(gcf, fullfile('results', 'figures', DataName, Pipeline, Sample, 'SLM', ...
-        'by-gene-group', strcat(SampleShort, '-', 'group', num2str(i))), 'svg');
+        'functional-clusters', strcat(SampleShort, '-', 'cluster', num2str(i))), 'svg');
 end
 
-%% Contour Plots By Gene Group
+%% Contour Plots By Functional Cluster
 for i = 1:6
-    % Get genes from each gene group.
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Get genes from each functional cluster.
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     fp = fopen(fullfile('results', 'R', 'new-clusters', strcat('group', num2str(i), '.txt')), 'r');
     tmp = textscan(fp, '%s %s', inf);
     genes = tmp{1};
     fclose(fp);
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     iss_change_plot_contour_MG150(o, 'Pixel', genes, SpotSet);
     saveas(gcf, fullfile('results', 'figures', DataName, Pipeline, Sample, 'SLM', ...
-        'by-gene-group', 'contour', strcat(SampleShort, '-', 'group', num2str(i))), 'svg');
+        'functional-clusters', 'contour', strcat(SampleShort, '-', 'cluster', num2str(i))), 'svg');
 end
 
 %% Export Spot Codes
