@@ -101,30 +101,28 @@ gene_names2 <- read.table(
 )
 gene_names_pilot <- gene_names[gene_names$V1 %in% gene_names2$V1, ]
 
-cluster_list <- vector("list", 7)
+cluster_list <- vector("list", 6)
 for (i in seq_along(cluster_list)) {
   cluster_list[[i]] <- read.table(
     file.path(results_dir, "new-clusters", paste0("group", i, ".txt")), FALSE, "\t"
   )
 }
 
-for (i in 1:6) {
-  cluster_list[[i]] <- cluster_list[[i]][-which(cluster_list[[i]]$V1 %in% cluster_list[[7]]$V1), ]
-}
-cluster_list[[7]] <- cluster_list[[7]]$V1
-
 gene_names$V3 <- gene_names$V2
 for (i in seq_along(gene_names$V3)) {
   gene_names$V3[i] <- which(
-    sapply(seq_along(cluster_list), function(x) {gene_names$V1[i] %in% cluster_list[[x]]})
+    sapply(seq_along(cluster_list), function(x) {gene_names$V1[i] %in% cluster_list[[x]]$V1})
   )
 }
 gene_names_pilot$V3 <- gene_names_pilot$V2
 for (i in seq_along(gene_names_pilot$V3)) {
   gene_names_pilot$V3[i] <- which(
-    sapply(seq_along(cluster_list), function(x) {gene_names_pilot$V1[i] %in% cluster_list[[x]]})
+    sapply(seq_along(cluster_list), function(x) {gene_names_pilot$V1[i] %in% cluster_list[[x]]$V1})
   )
 }
+
+DAM_genes <- read.table(file.path(results_dir, "new-clusters", "group7.txt"), FALSE, "\t")
+gene_names <- gene_names[gene_names$V1 %in% DAM_genes$V1, ]
 ```
 
 # CTRL
@@ -154,8 +152,11 @@ ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster, color = c
   geom_bar(stat = "identity", alpha = 0.8) +
   coord_flip() +
   labs(
-    x = "Genes", y = "Number of Spots (Log Scale)",
-    title = paste0(sample, " Genes vs. Number of Spots")
+    x = "Genes",
+    y = "Number of Spots (Log Scale)",
+    title = paste0(
+      sample, " Genes vs. Number of Spots. DAM Genes Only (Disease-Associated-Microglia)"
+    )
   ) +
   theme_black() +
   scale_y_log10(n.breaks = 6, expand = expansion(mult = c(0, 0)), limits = c(1, 20000)) +
@@ -174,12 +175,11 @@ ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster, color = c
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
     values = c(
       hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
     )
   ) +
   scale_color_manual(
@@ -195,7 +195,7 @@ ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster, color = c
     ),
     values = c(
       hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
     )
   )
 ```
@@ -207,8 +207,11 @@ ggplot(spot_names_table, aes(x = cluster, y = freq, fill = cluster, color = clus
   geom_bar(data = spot_names_mean, stat = "identity", alpha = 0.3) +
   geom_point() +
   labs(
-    x = "Clusters", y = "Number of Spots (Log Scale)",
-    title = paste0(sample, " Cluster Means vs. Number of Spots")
+    x = "Clusters",
+    y = "Number of Spots (Log Scale)",
+    title = paste0(
+      sample, " Cluster Means vs. Number of Spots. DAM Genes Only (Disease-Associated-Microglia)"
+    )
   ) +
   theme_black() +
   coord_flip() +
@@ -227,12 +230,11 @@ ggplot(spot_names_table, aes(x = cluster, y = freq, fill = cluster, color = clus
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
     values = c(
       hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
     )
   ) +
   scale_color_manual(
@@ -243,12 +245,11 @@ ggplot(spot_names_table, aes(x = cluster, y = freq, fill = cluster, color = clus
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
     values = c(
       hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
     )
   )
 ```
@@ -269,22 +270,23 @@ ggplot(spot_names_mean, aes(x = "", y = freq, fill = cluster)) +
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
     values = c(
       hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
     )
   ) +
-  labs(title = paste0(sample, " Cluster Proportions")) +
+  labs(
+    title = paste0(sample, " Cluster Proportions. DAM Genes Only (Disease-Associated-Microglia)")
+  ) +
   theme(
     panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
     axis.text.x = element_blank(), axis.text.y = element_blank(),
     axis.title.x = element_blank(), axis.title.y = element_blank(),
     axis.ticks.x = element_blank(), axis.ticks.y = element_blank(),
     panel.border = element_blank(), legend.key.height = unit(1.5, "cm"),
-    plot.title = element_text(vjust = -5), plot.margin = unit(c(0,0,0,0), "cm")
+    plot.title = element_text(vjust = -5, size = 11), plot.margin = unit(c(0,0,0,0), "cm")
   )
 ```
 
@@ -455,8 +457,11 @@ ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster, color = c
   geom_bar(stat = "identity", alpha = 0.8) +
   coord_flip() +
   labs(
-    x = "Genes", y = "Number of Spots (Log Scale)",
-    title = paste0(sample, " Genes vs. Number of Spots (SLM)")
+    x = "Genes",
+    y = "Number of Spots (Log Scale)",
+    title = paste0(
+      sample, " Genes vs. Number of Spots (SLM). DAM Genes Only (Disease-Associated-Microglia)"
+    )
   ) +
   theme_black() +
   scale_y_log10(n.breaks = 6, expand = expansion(mult = c(0, 0)), limits = c(1, 20000)) +
@@ -471,33 +476,23 @@ ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster, color = c
     name = "Clusters",
     labels = c(
       "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
-      "ATPase activity\npH regulation",
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
-    values = c(
-      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
-    )
+    values = c(hsv(1, 1, 1), hsv(1 / 3, 1, 1), hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1))
   ) +
   scale_color_manual(
     name = "Clusters",
     labels = c(
       "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
-      "ATPase activity\npH regulation",
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
-    values = c(
-      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
-    )
+    values = c(hsv(1, 1, 1), hsv(1 / 3, 1, 1), hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1))
   )
 ```
 
@@ -508,8 +503,12 @@ ggplot(spot_names_table, aes(x = cluster, y = freq, fill = cluster, color = clus
   geom_bar(data = spot_names_mean, stat = "identity", alpha = 0.3) +
   geom_point() +
   labs(
-    x = "Clusters", y = "Number of Spots (Log Scale)",
-    title = paste0(sample, " Cluster Means vs. Number of Spots (SLM)")
+    x = "Clusters",
+    y = "Number of Spots (Log Scale)",
+    title = paste0(
+      sample,
+      " Cluster Means vs. Number of Spots (SLM). DAM Genes Only (Disease-Associated-Microglia)"
+    )
   ) +
   theme_black() +
   coord_flip() +
@@ -524,33 +523,23 @@ ggplot(spot_names_table, aes(x = cluster, y = freq, fill = cluster, color = clus
     name = "Clusters",
     labels = c(
       "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
-      "ATPase activity\npH regulation",
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
-    values = c(
-      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
-    )
+    values = c(hsv(1, 1, 1), hsv(1 / 3, 1, 1), hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1))
   ) +
   scale_color_manual(
     name = "Clusters",
     labels = c(
       "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
-      "ATPase activity\npH regulation",
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
-    values = c(
-      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
-    )
+    values = c(hsv(1, 1, 1), hsv(1 / 3, 1, 1), hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1))
   )
 ```
 
@@ -566,26 +555,24 @@ ggplot(spot_names_mean, aes(x = "", y = freq, fill = cluster)) +
     name = "Clusters",
     labels = c(
       "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
-      "ATPase activity\npH regulation",
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
-    values = c(
-      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
-    )
+    values = c(hsv(1, 1, 1), hsv(1 / 3, 1, 1), hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1))
   ) +
-  labs(title = paste0(sample, " Cluster Proportions (SLM)")) +
+  labs(
+    title = paste0(
+      sample, " Cluster Proportions (SLM). DAM Genes Only (Disease-Associated-Microglia)")
+    ) +
   theme(
     panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
     axis.text.x = element_blank(), axis.text.y = element_blank(),
     axis.title.x = element_blank(), axis.title.y = element_blank(),
     axis.ticks.x = element_blank(), axis.ticks.y = element_blank(),
     panel.border = element_blank(), legend.key.height = unit(1.5, "cm"),
-    plot.title = element_text(vjust = -5), plot.margin = unit(c(0,0,0,0), "cm")
+    plot.title = element_text(vjust = -5, size = 10), plot.margin = unit(c(0,0,0,0), "cm")
   )
 ```
 
@@ -615,8 +602,11 @@ ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster, color = c
   geom_bar(stat = "identity", alpha = 0.8) +
   coord_flip() +
   labs(
-    x = "Genes", y = "Number of Spots (Log Scale)",
-    title = paste0(sample, " Genes vs. Number of Spots")
+    x = "Genes",
+    y = "Number of Spots (Log Scale)",
+    title = paste0(
+      sample, " Genes vs. Number of Spots. DAM Genes Only (Disease-Associated-Microglia)"
+    )
   ) +
   theme_black() +
   scale_y_log10(n.breaks = 6, expand = expansion(mult = c(0, 0)), limits = c(1, 20000)) +
@@ -635,12 +625,11 @@ ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster, color = c
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
     values = c(
       hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
     )
   ) +
   scale_color_manual(
@@ -651,12 +640,11 @@ ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster, color = c
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
     values = c(
       hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
     )
   )
 ```
@@ -668,8 +656,11 @@ ggplot(spot_names_table, aes(x = cluster, y = freq, fill = cluster, color = clus
   geom_bar(data = spot_names_mean, stat = "identity", alpha = 0.3) +
   geom_point() +
   labs(
-    x = "Clusters", y = "Number of Spots (Log Scale)",
-    title = paste0(sample, " Cluster Means vs. Number of Spots")
+    x = "Clusters",
+    y = "Number of Spots (Log Scale)",
+    title = paste0(
+      sample, " Cluster Means vs. Number of Spots. DAM Genes Only (Disease-Associated-Microglia)"
+    )
   ) +
   theme_black() +
   coord_flip() +
@@ -688,12 +679,11 @@ ggplot(spot_names_table, aes(x = cluster, y = freq, fill = cluster, color = clus
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
     values = c(
       hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
     )
   ) +
   scale_color_manual(
@@ -704,12 +694,11 @@ ggplot(spot_names_table, aes(x = cluster, y = freq, fill = cluster, color = clus
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
     values = c(
       hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
     )
   )
 ```
@@ -730,22 +719,23 @@ ggplot(spot_names_mean, aes(x = "", y = freq, fill = cluster)) +
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
     values = c(
       hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
+      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1)
     )
   ) +
-  labs(title = paste0(sample, " Cluster Proportions")) +
+  labs(
+    title = paste0(sample, " Cluster Proportions. DAM Genes Only (Disease-Associated-Microglia)")
+  ) +
   theme(
     panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
     axis.text.x = element_blank(), axis.text.y = element_blank(),
     axis.title.x = element_blank(), axis.title.y = element_blank(),
     axis.ticks.x = element_blank(), axis.ticks.y = element_blank(),
     panel.border = element_blank(), legend.key.height = unit(1.5, "cm"),
-    plot.title = element_text(vjust = -5), plot.margin = unit(c(0,0,0,0), "cm")
+    plot.title = element_text(vjust = -5, size = 11), plot.margin = unit(c(0,0,0,0), "cm")
   )
 ```
 
@@ -916,7 +906,9 @@ ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster, color = c
   coord_flip() +
   labs(
     x = "Genes", y = "Number of Spots (Log Scale)",
-    title = paste0(sample, " Genes vs. Number of Spots (SLM)")
+    title = paste0(
+      sample, " Genes vs. Number of Spots (SLM). DAM Genes Only (Disease-Associated-Microglia)"
+    )
   ) +
   theme_black() +
   scale_y_log10(n.breaks = 6, expand = expansion(mult = c(0, 0)), limits = c(1, 20000)) +
@@ -931,33 +923,23 @@ ggplot(spot_names_table, aes(x = gene_names, y = freq, fill = cluster, color = c
     name = "Clusters",
     labels = c(
       "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
-      "ATPase activity\npH regulation",
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
-    values = c(
-      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
-    )
+    values = c(hsv(1, 1, 1), hsv(1 / 3, 1, 1), hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1))
   ) +
   scale_color_manual(
     name = "Clusters",
     labels = c(
       "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
-      "ATPase activity\npH regulation",
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
-    values = c(
-      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
-    )
+    values = c(hsv(1, 1, 1), hsv(1 / 3, 1, 1), hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1))
   )
 ```
 
@@ -969,7 +951,10 @@ ggplot(spot_names_table, aes(x = cluster, y = freq, fill = cluster, color = clus
   geom_point() +
   labs(
     x = "Clusters", y = "Number of Spots (Log Scale)",
-    title = paste0(sample, " Cluster Means vs. Number of Spots (SLM)")
+    title = paste0(
+      sample,
+      " Cluster Means vs. Number of Spots (SLM). DAM Genes Only (Disease-Associated-Microglia)"
+    )
   ) +
   theme_black() +
   coord_flip() +
@@ -984,33 +969,23 @@ ggplot(spot_names_table, aes(x = cluster, y = freq, fill = cluster, color = clus
     name = "Clusters",
     labels = c(
       "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
-      "ATPase activity\npH regulation",
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
-    values = c(
-      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
-    )
+    values = c(hsv(1, 1, 1), hsv(1 / 3, 1, 1), hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1))
   ) +
   scale_color_manual(
     name = "Clusters",
     labels = c(
       "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
-      "ATPase activity\npH regulation",
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
-    values = c(
-      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
-    )
+    values = c(hsv(1, 1, 1), hsv(1 / 3, 1, 1), hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1))
   )
 ```
 
@@ -1026,26 +1001,25 @@ ggplot(spot_names_mean, aes(x = "", y = freq, fill = cluster)) +
     name = "Clusters",
     labels = c(
       "Interferon signaling\nAntigen processing (MHC class II)\nMyeloid leukocyte activation",
-      "ATPase activity\npH regulation",
       "Lysosome activity\nProtein processing\nPeptidase activity",
       "Phagocytic cup formation\nFc-gamma receptor activity\nActin cytoskeletal processes",
       "Phagosome formation\nActin cytoskeletal processes",
-      "Uncatagorized",
-      "DAM (Disease associated microglia) genes"
+      "Uncatagorized"
     ),
-    values = c(
-      hsv(1, 1, 1), hsv(0.13, 1, 1), hsv(1 / 3, 1, 1),
-      hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1), hsv(0.85, 1, 1)
+    values = c(hsv(1, 1, 1), hsv(1 / 3, 1, 1), hsv(0.1, 1, 0.6), hsv(0.55, 1, 1), hsv(0, 0, 1))
+  ) +
+  labs(
+    title = paste0(
+      sample, " Cluster Proportions (SLM). DAM Genes Only (Disease-Associated-Microglia)"
     )
   ) +
-  labs(title = paste0(sample, " Cluster Proportions (SLM)")) +
   theme(
     panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
     axis.text.x = element_blank(), axis.text.y = element_blank(),
     axis.title.x = element_blank(), axis.title.y = element_blank(),
     axis.ticks.x = element_blank(), axis.ticks.y = element_blank(),
     panel.border = element_blank(), legend.key.height = unit(1.5, "cm"),
-    plot.title = element_text(vjust = -5), plot.margin = unit(c(0,0,0,0), "cm")
+    plot.title = element_text(vjust = -5, size = 10), plot.margin = unit(c(0,0,0,0), "cm")
   )
 ```
 
